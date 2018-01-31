@@ -3,6 +3,8 @@ package li.brianv.bidtactoe.gameservice.mongo
 import com.mongodb.MongoClient
 import com.mongodb.MongoClientURI
 import li.brianv.bidtactoe.gameservice.exceptions.MongoNotYetAvailableException
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.stereotype.Service
 import java.util.concurrent.Future
