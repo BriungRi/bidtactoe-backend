@@ -1,6 +1,7 @@
 package li.brianv.bidtactoe.gameservice.mongo
 
 import com.mongodb.MongoClient
+import com.mongodb.MongoClientURI
 import li.brianv.bidtactoe.gameservice.exceptions.MongoNotYetAvailableException
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.stereotype.Service
@@ -20,7 +21,8 @@ class MongoConnectionService(taskScheduler: TaskScheduler) {
     }
 
     private fun connectToMongo() {
-        mongoClient = MongoClient("localhost", 27017)
+        val uri = MongoClientURI("mongodb+srv://brian:crazyowls123!@bidtactoe-svmnm.mongodb.net/")
+        mongoClient = MongoClient(uri)
     }
 
     init {
