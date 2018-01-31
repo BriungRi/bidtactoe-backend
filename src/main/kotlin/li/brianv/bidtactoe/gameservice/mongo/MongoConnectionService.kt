@@ -23,7 +23,7 @@ class MongoConnectionService(taskScheduler: TaskScheduler) {
     }
 
     private fun connectToMongo() {
-        val uri = MongoClientURI("mongodb+srv://brian:crazyowls123!@bidtactoe-svmnm.mongodb.net/")
+        val uri = MongoClientURI("mongodb+srv://brian:mZGEpxV46WlZCWrL@bidtactoe-svmnm.mongodb.net/")
         mongoClient = MongoClient(uri)
     }
 
