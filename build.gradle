@@ -42,6 +42,7 @@ jar {
 
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
+    compile("org.springframework.boot:spring-boot-starter-websocket")
     compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}")
     compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
     testCompile('org.springframework.boot:spring-boot-starter-test')
@@ -57,6 +58,13 @@ dependencies {
 
     // MongoDB Driver
     compile 'org.mongodb:mongo-java-driver:3.6.1'
+
+    // Spring websockets
+    compile("org.webjars:webjars-locator")
+    compile("org.webjars:sockjs-client:1.0.2")
+    compile("org.webjars:stomp-websocket:2.3.3")
+    compile("org.webjars:bootstrap:3.3.7")
+    compile("org.webjars:jquery:3.1.0")
 }
 
 task buildDocker(type: Docker, dependsOn: build) {

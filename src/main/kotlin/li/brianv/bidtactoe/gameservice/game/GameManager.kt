@@ -1,12 +1,14 @@
 package li.brianv.bidtactoe.gameservice.game
 
 import li.brianv.bidtactoe.gameservice.firebase.GameFCMComponent
+import li.brianv.bidtactoe.gameservice.websockets.WSController
 import java.util.*
 
 class GameManager(private val playerQueue: Queue<Player>,
                   private val gameArray: ArrayList<Game>,
                   private val moveMaker: MoveMaker,
-                  private val gameFCMComponent: GameFCMComponent) {
+                  private val gameFCMComponent: GameFCMComponent,
+                  private val wsController: WSController) {
 
     private val NO_WINNER = "no_winner"
 
@@ -22,6 +24,9 @@ class GameManager(private val playerQueue: Queue<Player>,
             gameFCMComponent.gameReadyUpdate(gameIndex.toString(),
                     playerOne.playerId,
                     *getDeviceTokens(game))
+            wsController.gameReadyUpdate(gameIndex.toString(),
+                    playerOne.playerId,
+                    playerTwo.playerId)
         }
     }
 
