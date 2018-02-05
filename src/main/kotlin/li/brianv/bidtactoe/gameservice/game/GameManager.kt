@@ -1,6 +1,7 @@
 package li.brianv.bidtactoe.gameservice.game
 
 import li.brianv.bidtactoe.gameservice.firebase.GameFCMComponent
+import li.brianv.bidtactoe.gameservice.websockets.HelloMessage
 import li.brianv.bidtactoe.gameservice.websockets.WSController
 import java.util.*
 
@@ -27,6 +28,7 @@ class GameManager(private val playerQueue: Queue<Player>,
             wsController.gameReadyUpdate(gameIndex.toString(),
                     playerOne.playerId,
                     playerTwo.playerId)
+            wsController.greeting(HelloMessage("brnli7"))
         }
     }
 
