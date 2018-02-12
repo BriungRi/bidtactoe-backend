@@ -4,7 +4,7 @@ import li.brianv.bidtactoe.gameservice.firebase.GameFCMComponent
 import li.brianv.bidtactoe.gameservice.game.GameManager
 import li.brianv.bidtactoe.gameservice.game.MoveMaker
 import li.brianv.bidtactoe.gameservice.game.Player
-import li.brianv.bidtactoe.gameservice.websockets.WSController
+import li.brianv.bidtactoe.gameservice.websockets.GameWSComponent
 import org.riversun.fcm.FcmClient
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
@@ -15,11 +15,11 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler
 import java.util.*
 
 @SpringBootApplication
-@EnableAutoConfiguration(exclude = arrayOf(MongoAutoConfiguration::class))
+@EnableAutoConfiguration(exclude = [(MongoAutoConfiguration::class)])
 class GameServiceApplication {
     @Bean
-    fun provideGameManager(moveMaker: MoveMaker, gameFCMComponent: GameFCMComponent, wsController: WSController): GameManager {
-        return GameManager(LinkedList<Player>() as Queue<Player>, ArrayList(), moveMaker, gameFCMComponent, wsController)
+    fun provideGameManager(moveMaker: MoveMaker, gameFCMComponent: GameFCMComponent, gameWSComponent: GameWSComponent): GameManager {
+        return GameManager(LinkedList<Player>() as Queue<Player>, ArrayList(), moveMaker, gameFCMComponent, gameWSComponent)
     }
 
     @Bean
