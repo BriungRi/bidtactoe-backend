@@ -9,8 +9,11 @@ import org.springframework.stereotype.Component
 class GameWSComponent(val messagingTemplate: SimpMessageSendingOperations) {
     val logger = LoggerFactory.getLogger(GameWSComponent::class.java.simpleName)
 
-    fun gameReadyUpdate(gameIndex: String, playerOneId: String, playerTwoId: String) {
-        logger.info("gameReadyUpdate() gameIndex: $gameIndex, playerOneId: $playerOneId, playerTwoId: $playerTwoId")
-        messagingTemplate.convertAndSend("/topic/public", GameReadyMessage(gameIndex, playerOneId, playerTwoId))
+    fun gameReadyUpdate(gameIndex: String, playerOneUsername: String, playerTwoUsername: String) {
+        logger.info("gameReadyUpdate() gameIndex: $gameIndex, playerOneId: $playerOneUsername, playerTwoUsername: $playerTwoUsername")
+        messagingTemplate.convertAndSend("/topic/public/$playerOneUsername",
+                GameReadyMessage(gameIndex, playerOneUsername, playerTwoUsername))
+        messagingTemplate.convertAndSend("/topic/public/$playerTwoUsername",
+                GameReadyMessage(gameIndex, playerOneUsername, playerTwoUsername))
     }
 }

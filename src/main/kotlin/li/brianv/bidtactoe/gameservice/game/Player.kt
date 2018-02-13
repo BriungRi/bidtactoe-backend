@@ -1,6 +1,6 @@
 package li.brianv.bidtactoe.gameservice.game
 
-class Player(val playerId: String,
+class Player(val username: String,
              val deviceId: String,
              var currentBid: Int,
              var biddingPower: Int) {

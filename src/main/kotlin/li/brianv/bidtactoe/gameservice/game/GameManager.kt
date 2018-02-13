@@ -12,8 +12,8 @@ class GameManager(private val playerQueue: Queue<Player>,
 
     private val NO_WINNER = "no_winner"
 
-    fun joinGame(playerId: String, deviceId: String) { // TODO: Synchronize this method?
-        playerQueue.add(Player(playerId, deviceId, -1, 100))
+    fun joinGame(username: String, deviceId: String) { // TODO: Synchronize this method?
+        playerQueue.add(Player(username, deviceId, -1, 100))
         if (playerQueue.size >= 2) {
             val playerOne = playerQueue.poll()
             val playerTwo = playerQueue.poll()
@@ -22,23 +22,23 @@ class GameManager(private val playerQueue: Queue<Player>,
             //TODO: Create games in null spaces
             val gameIndex = gameArray.size - 1
             gameFCMComponent.gameReadyUpdate(gameIndex.toString(),
-                    playerOne.playerId,
+                    playerOne.username,
                     *getDeviceTokens(game))
             this.gameWSComponent.gameReadyUpdate(gameIndex.toString(),
-                    playerOne.playerId,
-                    playerTwo.playerId)
+                    playerOne.username,
+                    playerTwo.username)
         }
     }
 
-    fun leaveQueue(playerId: String) {
+    fun leaveQueue(username: String) {
         playerQueue
-                .filter { it.playerId == playerId }
+                .filter { it.username == username }
                 .forEach { playerQueue.remove(it) }
     }
 
-    fun bid(playerId: String, gameIndex: Int, bidAmt: Int) {
+    fun bid(username: String, gameIndex: Int, bidAmt: Int) {
         val game = gameArray[gameIndex]
-        moveMaker.bid(game, playerId, bidAmt)
+        moveMaker.bid(game, username, bidAmt)
         if (game.playerOne.hasBid() && game.playerTwo.hasBid()) {
             val bidWinnerId = getBidWinner(game.playerOne, game.playerTwo)
             if (bidWinnerId != NO_WINNER)
@@ -57,15 +57,15 @@ class GameManager(private val playerQueue: Queue<Player>,
     private fun getBidWinner(playerOne: Player, playerTwo: Player): String {
         if (playerOne.currentBid != playerTwo.currentBid) {
             return if (playerOne.currentBid > playerTwo.currentBid)
-                playerOne.playerId
+                playerOne.username
             else
-                playerTwo.playerId
+                playerTwo.username
         }
         return NO_WINNER
     }
 
     private fun applyBids(playerOne: Player, playerTwo: Player, winnerId: String) {
-        if (playerOne.playerId == winnerId) {
+        if (playerOne.username == winnerId) {
             playerOne.applyBid()
             playerTwo.gainBiddingPower(playerOne.currentBid)
         } else {
@@ -84,7 +84,7 @@ class GameManager(private val playerQueue: Queue<Player>,
         val gameWinner = game.getWinner()
         gameFCMComponent.moveUpdate(cells, *getDeviceTokens(game))
         if (gameWinner != null)
-            gameFCMComponent.victoryUpdate(gameWinner.playerId, *getDeviceTokens(game))
+            gameFCMComponent.victoryUpdate(gameWinner.username, *getDeviceTokens(game))
     }
 }
 

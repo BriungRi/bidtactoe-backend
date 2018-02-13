@@ -4,14 +4,14 @@ import org.springframework.stereotype.Component
 
 @Component
 class MoveMaker {
-    fun bid(game: Game, playerId: String, bidAmt: Int) {
-        val player = getPlayer(game, playerId)
+    fun bid(game: Game, username: String, bidAmt: Int) {
+        val player = getPlayer(game, username)
         if (bidAmt in 0..player.biddingPower)
             player.currentBid = bidAmt
     }
 
-    private fun getPlayer(game: Game, playerId: String): Player {
-        if (game.playerOne.playerId == playerId)
+    private fun getPlayer(game: Game, username: String): Player {
+        if (game.playerOne.username == username)
             return game.playerOne
         else
             return game.playerTwo

@@ -29,7 +29,7 @@ class GameServiceApplication {
         return client
     }
 
-    @Bean(name = arrayOf("mongoTaskScheduler"))
+    @Bean(name = ["mongoTaskScheduler"])
     fun provideTaskScheduler(): ConcurrentTaskScheduler {
         return ConcurrentTaskScheduler()
     }

@@ -11,32 +11,32 @@ import org.springframework.web.bind.annotation.*
 
 @CrossOrigin(origins = ["http://localhost:3000"])
 @RestController
-class GameController(val gameManager: GameManager, val userRepository: UserRepository) {
+class GameRestController(val gameManager: GameManager, val userRepository: UserRepository) {
 
-    val logger: Logger = LoggerFactory.getLogger(GameController::class.java.simpleName)
+    val logger: Logger = LoggerFactory.getLogger(GameRestController::class.java.simpleName)
 
     @RequestMapping(method = [(RequestMethod.POST)],
             value = ["/join_game"],
             consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
-    fun joinGame(playerId: String, deviceId: String) {
-        logger.info("Join Game: playerId: $playerId, deviceId: $deviceId")
-        gameManager.joinGame(playerId, deviceId)
+    fun joinGame(username: String, deviceId: String) {
+        logger.info("Join Game: username: $username, deviceId: $deviceId")
+        gameManager.joinGame(username, deviceId)
     }
 
     @RequestMapping(method = [(RequestMethod.POST)],
             value = ["/leave_queue"],
             consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
-    fun leaveQueue(playerId: String) {
-        logger.info("Leave Queue: playerId: $playerId")
-        gameManager.leaveQueue(playerId)
+    fun leaveQueue(username: String) {
+        logger.info("Leave Queue: username: $username")
+        gameManager.leaveQueue(username)
     }
 
     @RequestMapping(method = [(RequestMethod.POST)],
             value = ["/bid"],
             consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
-    fun bid(playerId: String, gameIndex: Int, bidAmt: Int) {
-        logger.info("Bid: playerId: $playerId, gameIndex: $gameIndex, bidAmt: $bidAmt")
-        gameManager.bid(playerId, gameIndex, bidAmt)
+    fun bid(username: String, gameIndex: Int, bidAmt: Int) {
+        logger.info("Bid: username: $username, gameIndex: $gameIndex, bidAmt: $bidAmt")
+        gameManager.bid(username, gameIndex, bidAmt)
     }
 
     @RequestMapping(method = [(RequestMethod.POST)],
