@@ -23,8 +23,8 @@ class GameManager(private val playerQueue: Queue<Player>,
             val gameIndex = gameArray.size - 1
             gameFCMComponent.gameReadyUpdate(gameIndex.toString(),
                     playerOne.username,
-                    *getDeviceTokens(game))
-            this.gameWSComponent.gameReadyUpdate(gameIndex.toString(),
+                    *game.getPlayerDeviceTokens())
+            gameWSComponent.gameReadyUpdate(gameIndex,
                     playerOne.username,
                     playerTwo.username)
         }
@@ -43,12 +43,18 @@ class GameManager(private val playerQueue: Queue<Player>,
             val bidWinnerId = getBidWinner(game.playerOne, game.playerTwo)
             if (bidWinnerId != NO_WINNER)
                 applyBids(game.playerOne, game.playerTwo, bidWinnerId)
-            gameFCMComponent.bidUpdate(bidWinnerId, // TODO: Verbose method signature
+            gameFCMComponent.bidsCompletedUpdate(bidWinnerId, // TODO: Verbose method signature
                     game.playerOne.biddingPower.toString(),
-                    game.playerOne.deviceId)
-            gameFCMComponent.bidUpdate(bidWinnerId,
+                    game.playerOne.deviceToken)
+            gameFCMComponent.bidsCompletedUpdate(bidWinnerId,
                     game.playerTwo.biddingPower.toString(),
-                    game.playerTwo.deviceId)
+                    game.playerTwo.deviceToken)
+            gameWSComponent.bidsCompletedUpdate(bidWinnerId, // TODO: One component to handle push notifications
+                    game.playerOne.biddingPower,
+                    game.playerOne.username)
+            gameWSComponent.bidsCompletedUpdate(bidWinnerId,
+                    game.playerTwo.biddingPower,
+                    game.playerTwo.username)
             game.playerOne.resetBid()
             game.playerTwo.resetBid()
         }
@@ -74,17 +80,16 @@ class GameManager(private val playerQueue: Queue<Player>,
         }
     }
 
-    private fun getDeviceTokens(game: Game): Array<String> {
-        return arrayOf(game.playerOne.deviceId, game.playerTwo.deviceId)
-    }
-
     fun makeMove(gameIndex: Int, cells: String) {
         val game = gameArray[gameIndex]
         moveMaker.makeMove(game, cells)
         val gameWinner = game.getWinner()
-        gameFCMComponent.moveUpdate(cells, *getDeviceTokens(game))
-        if (gameWinner != null)
-            gameFCMComponent.victoryUpdate(gameWinner.username, *getDeviceTokens(game))
+        gameFCMComponent.moveUpdate(cells, *game.getPlayerDeviceTokens())
+        gameWSComponent.moveUpdate(cells, *game.getPlayerUsernames())
+        if (gameWinner != null) {
+            gameFCMComponent.victoryUpdate(gameWinner.username, *game.getPlayerDeviceTokens())
+            gameWSComponent.victoryUpdate(gameWinner.username, *game.getPlayerUsernames())
+        }
     }
 }
 

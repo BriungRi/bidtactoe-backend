@@ -1,3 +1,5 @@
 package li.brianv.bidtactoe.gameservice.model
 
-data class GameReadyMessage(val gameIndex: String, val playerOneId: String, val playerTwoId: String)
+data class GameReadyMessage(val gameIndex: Int, val playerOneUsername: String, val playerTwoUsername: String) {
+    val type: String = "GAME_READY_MESSAGE"
+}

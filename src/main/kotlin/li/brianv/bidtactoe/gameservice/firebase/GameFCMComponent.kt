@@ -24,7 +24,7 @@ class GameFCMComponent(val fcmClient: FcmClient) {
                 *deviceTokens)
     }
 
-    fun bidUpdate(bidWinnerId: String, biddingPower: String, deviceToken: String) {
+    fun bidsCompletedUpdate(bidWinnerId: String, biddingPower: String, deviceToken: String) {
         sendMessage("$BID_WINNER_KEY,$BID_POWER_KEY",
                 "$bidWinnerId,$biddingPower",
                 deviceToken)

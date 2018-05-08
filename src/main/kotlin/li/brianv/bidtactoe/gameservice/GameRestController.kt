@@ -19,7 +19,7 @@ class GameRestController(val gameManager: GameManager, val userRepository: UserR
             value = ["/join_game"],
             consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
     fun joinGame(username: String, deviceId: String) {
-        logger.info("Join Game: username: $username, deviceId: $deviceId")
+        logger.info("Join Game: username: $username, deviceToken: $deviceId")
         gameManager.joinGame(username, deviceId)
     }
 
