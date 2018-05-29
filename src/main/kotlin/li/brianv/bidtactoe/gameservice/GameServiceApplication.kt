@@ -2,8 +2,7 @@ package li.brianv.bidtactoe.gameservice
 
 import li.brianv.bidtactoe.gameservice.firebase.GameFCMComponent
 import li.brianv.bidtactoe.gameservice.game.GameManager
-import li.brianv.bidtactoe.gameservice.game.MoveMaker
-import li.brianv.bidtactoe.gameservice.game.Player
+import li.brianv.bidtactoe.gameservice.game.player.Player
 import li.brianv.bidtactoe.gameservice.websockets.GameWSComponent
 import org.riversun.fcm.FcmClient
 import org.springframework.boot.SpringApplication
@@ -18,8 +17,8 @@ import java.util.*
 @EnableAutoConfiguration(exclude = [(MongoAutoConfiguration::class)])
 class GameServiceApplication {
     @Bean
-    fun provideGameManager(moveMaker: MoveMaker, gameFCMComponent: GameFCMComponent, gameWSComponent: GameWSComponent): GameManager {
-        return GameManager(LinkedList<Player>() as Queue<Player>, ArrayList(), moveMaker, gameFCMComponent, gameWSComponent)
+    fun provideGameManager(gameFCMComponent: GameFCMComponent, gameWSComponent: GameWSComponent): GameManager {
+        return GameManager(LinkedList<Player>(), ArrayList(), gameFCMComponent, gameWSComponent)
     }
 
     @Bean

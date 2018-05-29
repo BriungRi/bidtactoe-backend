@@ -1,6 +1,6 @@
 package li.brianv.bidtactoe.gameservice.repository
 
-import li.brianv.bidtactoe.gameservice.model.User
+import li.brianv.bidtactoe.gameservice.model.user.User
 
 interface UserRepository {
     fun createUser(username: String, email: String, password: String)

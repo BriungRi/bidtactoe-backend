@@ -2,14 +2,14 @@ package li.brianv.bidtactoe.gameservice
 
 import li.brianv.bidtactoe.gameservice.exceptions.BadLoginException
 import li.brianv.bidtactoe.gameservice.game.GameManager
-import li.brianv.bidtactoe.gameservice.model.User
+import li.brianv.bidtactoe.gameservice.model.user.User
 import li.brianv.bidtactoe.gameservice.repository.UserRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@CrossOrigin(origins = ["http://localhost:3000"])
+@CrossOrigin(origins = ["http://localhost:3000", "http://tactoe.bid"])
 @RestController
 class GameRestController(val gameManager: GameManager, val userRepository: UserRepository) {
 
@@ -18,9 +18,9 @@ class GameRestController(val gameManager: GameManager, val userRepository: UserR
     @RequestMapping(method = [(RequestMethod.POST)],
             value = ["/join_game"],
             consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
-    fun joinGame(username: String, deviceId: String) {
-        logger.info("Join Game: username: $username, deviceToken: $deviceId")
-        gameManager.joinGame(username, deviceId)
+    fun joinGame(username: String, deviceType: String, deviceToken: String) {
+        logger.info("Join Game: username: $username, deviceType: $deviceType, deviceToken: $deviceToken")
+        gameManager.joinGame(username, deviceType, deviceToken)
     }
 
     @RequestMapping(method = [(RequestMethod.POST)],
@@ -44,9 +44,6 @@ class GameRestController(val gameManager: GameManager, val userRepository: UserR
             consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
     fun makeMove(gameIndex: Int, cells: String) {
         logger.info("Make Move: gameIndex $gameIndex, cells: $cells")
-        for (cell in cells.convertStringToCellsArray()) {
-            logger.info("cell: $cell")
-        }
         gameManager.makeMove(gameIndex, cells)
     }
 

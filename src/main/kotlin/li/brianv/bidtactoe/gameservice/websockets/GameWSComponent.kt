@@ -1,9 +1,9 @@
 package li.brianv.bidtactoe.gameservice.websockets
 
-import li.brianv.bidtactoe.gameservice.model.BidsReadyMessage
-import li.brianv.bidtactoe.gameservice.model.GameReadyMessage
-import li.brianv.bidtactoe.gameservice.model.MoveUpdateMessage
-import li.brianv.bidtactoe.gameservice.model.WinnerUpdateMessage
+import li.brianv.bidtactoe.gameservice.model.messages.BidsReadyMessage
+import li.brianv.bidtactoe.gameservice.model.messages.GameReadyMessage
+import li.brianv.bidtactoe.gameservice.model.messages.MoveUpdateMessage
+import li.brianv.bidtactoe.gameservice.model.messages.WinnerUpdateMessage
 import org.slf4j.LoggerFactory
 import org.springframework.messaging.simp.SimpMessageSendingOperations
 import org.springframework.stereotype.Component
@@ -12,12 +12,17 @@ import org.springframework.stereotype.Component
 class GameWSComponent(val messagingTemplate: SimpMessageSendingOperations) {
     val logger = LoggerFactory.getLogger(GameWSComponent::class.java.simpleName)
 
-    fun gameReadyUpdate(gameIndex: Int, playerOneUsername: String, playerTwoUsername: String) {
-        logger.info("gameReadyUpdate() gameIndex: $gameIndex, playerOneId: $playerOneUsername, playerTwoUsername: $playerTwoUsername")
-        messagingTemplate.convertAndSend("/topic/public/$playerOneUsername",
-                GameReadyMessage(gameIndex, playerOneUsername, playerTwoUsername))
-        messagingTemplate.convertAndSend("/topic/public/$playerTwoUsername",
-                GameReadyMessage(gameIndex, playerOneUsername, playerTwoUsername))
+    fun gameReadyUpdate(gameIndex: Int, playerOneUsername: String, playerTwoUsername: String, username: String) {
+        Thread {
+            Thread.sleep(1000)
+            logger.info("gameReadyUpdate() " +
+                    "gameIndex: $gameIndex, " +
+                    "playerOneUsername: $playerOneUsername, " +
+                    "playerTwoUsername: $playerTwoUsername, " +
+                    "username: $username")
+            messagingTemplate.convertAndSend("/topic/public/$username",
+                    GameReadyMessage(gameIndex, playerOneUsername, playerTwoUsername))
+        }.run()
     }
 
     fun bidsCompletedUpdate(bidWinnerId: String, biddingPower: Int, username: String) {

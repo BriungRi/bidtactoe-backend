@@ -15,7 +15,7 @@ buildscript {
 }
 
 group = 'briungri'
-version = '0.9'
+version = 'latest'
 
 apply plugin: 'kotlin'
 apply plugin: 'kotlin-spring'
@@ -23,7 +23,7 @@ apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'docker'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 1.7
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
@@ -37,7 +37,7 @@ repositories {
 
 jar {
     baseName = 'bidtactoe-backend'
-    version = '0.9'
+    version = 'latest'
 }
 
 dependencies {
