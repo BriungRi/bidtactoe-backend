@@ -7,13 +7,14 @@ import li.brianv.bidtactoe.gameservice.model.messages.WinnerUpdateMessage
 import org.slf4j.LoggerFactory
 import org.springframework.messaging.simp.SimpMessageSendingOperations
 import org.springframework.stereotype.Component
+import kotlin.concurrent.thread
 
 @Component
 class GameWSComponent(val messagingTemplate: SimpMessageSendingOperations) {
     val logger = LoggerFactory.getLogger(GameWSComponent::class.java.simpleName)
 
     fun gameReadyUpdate(gameIndex: Int, playerOneUsername: String, playerTwoUsername: String, username: String) {
-        Thread {
+        thread(start = true) {
             Thread.sleep(1000)
             logger.info("gameReadyUpdate() " +
                     "gameIndex: $gameIndex, " +
@@ -33,14 +34,14 @@ class GameWSComponent(val messagingTemplate: SimpMessageSendingOperations) {
 
     fun moveUpdate(cells: String, vararg usernames: String) {
         logger.info("moveUpdate() cells: $cells")
-        for(username in usernames) {
+        for (username in usernames) {
             messagingTemplate.convertAndSend("/topic/public/$username", MoveUpdateMessage(cells))
         }
     }
 
     fun victoryUpdate(winnerId: String, vararg usernames: String) {
         logger.info("victoryUpdate() winnerId: $winnerId")
-        for(username in usernames) {
+        for (username in usernames) {
             messagingTemplate.convertAndSend("/topic/public/$username", WinnerUpdateMessage(winnerId))
         }
     }

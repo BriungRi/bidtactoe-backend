@@ -41,14 +41,13 @@ class GameManager(private val playerQueue: Queue<Player>,
         return gameArray.size
     }
 
-    fun confirmJoinedGame(username: String, gameIndex: Int) {
-
-    }
-
     fun leaveQueue(username: String) {
-        // TODO: May want to test
-        playerQueue.filter { it.username != username }
-                .toCollection(playerQueue)
+        val iterator = playerQueue.iterator()
+        while(iterator.hasNext()) {
+            val player = iterator.next()
+            if(player.username == username)
+                iterator.remove()
+        }
     }
 
     fun bid(username: String, gameIndex: Int, bidAmt: Int) = gameArray[gameIndex].bid(username, bidAmt)

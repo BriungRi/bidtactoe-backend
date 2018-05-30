@@ -5,6 +5,7 @@ import org.riversun.fcm.model.EntityMessage
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import kotlin.concurrent.thread
 
 const val GAME_INDEX_KEY: String = "gameIndex"
 const val PLAYER_ONE_KEY: String = "playerOneUsername"
@@ -20,7 +21,7 @@ class GameFCMComponent(val fcmClient: FcmClient) {
     val logger: Logger = LoggerFactory.getLogger(GameFCMComponent::class.java.simpleName)
 
     fun gameReadyUpdate(gameIndex: String, playerOneUsername: String, playerTwoUsername: String, deviceToken: String) {
-        Thread {
+        thread(start = true) {
             Thread.sleep(1000)
             logger.info("gameReadyUpdate(): " +
                     "gameIndex: $gameIndex, " +
