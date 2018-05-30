@@ -1,9 +1,13 @@
 package li.brianv.bidtactoe.gameservice.game.player
 
-abstract class AIPlayer : Player() {
+import li.brianv.bidtactoe.gameservice.GameRestController
+import li.brianv.bidtactoe.gameservice.game.PLAYER_ONE_PIECE
+import li.brianv.bidtactoe.gameservice.game.PLAYER_TWO_PIECE
+
+abstract class AIPlayer(val gameRestController: GameRestController) : Player() {
 
     override val username = "AI"
-    private var gameIndex = 0
+    private var gameIndex = -1
     private var isPlayerOne = false
     private var biddingPower = 100
     private var cells = "         "
@@ -11,19 +15,23 @@ abstract class AIPlayer : Player() {
     override fun onGameReady(gameIndex: Int, playerOneUsername: String, playerTwoUsername: String) {
         this.gameIndex = gameIndex
         this.isPlayerOne = playerOneUsername == username
-        getBidAmt(biddingPower, cells)
+        gameRestController.bid(username, gameIndex, getBidAmt(biddingPower, cells))
     }
 
     override fun onBidsCompleted(bidWinnerUsername: String, newBiddingPower: Int) {
         this.biddingPower = newBiddingPower
         if (username == bidWinnerUsername) {
-            getMoveIndex(biddingPower, cells, isPlayerOne)
+            val moveIndex = getMoveIndex(biddingPower, cells, isPlayerOne)
+            val newCells = cells.substring(0, moveIndex) +
+                    if (isPlayerOne) PLAYER_ONE_PIECE else PLAYER_TWO_PIECE +
+                            cells.substring(moveIndex + 1)
+            gameRestController.makeMove(gameIndex, newCells)
         }
     }
 
     override fun onMoveCompleted(newCells: String) {
         cells = newCells
-        getBidAmt(biddingPower, cells)
+        gameRestController.bid(username, gameIndex, getBidAmt(biddingPower, cells))
     }
 
     override fun onGameOver(winnerUsername: String) {}
