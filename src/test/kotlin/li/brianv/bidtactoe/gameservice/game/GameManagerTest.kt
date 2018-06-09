@@ -1,5 +1,6 @@
 package li.brianv.bidtactoe.gameservice.game
 
+import li.brianv.bidtactoe.gameservice.GameRestController
 import li.brianv.bidtactoe.gameservice.firebase.GameFCMComponent
 import li.brianv.bidtactoe.gameservice.game.player.AndroidPlayer
 import li.brianv.bidtactoe.gameservice.game.player.Player
@@ -15,7 +16,7 @@ class GameManagerTest {
     private val gameArray = ArrayList<Game>()
     private val gameFCMComponent = mock(GameFCMComponent::class.java)
     private val gameWSComponent = mock(GameWSComponent::class.java)
-    val gameManager = GameManager(playerQueue, gameArray, gameFCMComponent, gameWSComponent)
+    private val gameManager = GameManager(playerQueue, gameArray, gameFCMComponent, gameWSComponent)
 
     @Test
     fun joinGame_oneWebJoin() {
@@ -33,6 +34,7 @@ class GameManagerTest {
     fun joinGame_twoJoin() {
         gameManager.joinGame("", "android", "")
         gameManager.joinGame("", "web", "")
+        Thread.sleep(1000)
         assert(playerQueue.isEmpty())
         assert(!gameArray.isEmpty())
     }

@@ -1,7 +1,7 @@
 buildscript {
     ext {
         kotlinVersion = '1.2.10'
-        springBootVersion = '1.5.6.RELEASE'
+        springBootVersion = '1.5.13.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -22,6 +22,7 @@ apply plugin: 'kotlin-spring'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'docker'
+ext['mockito.version'] = '2.18.3'
 
 sourceCompatibility = 1.7
 compileKotlin {
@@ -43,12 +44,10 @@ jar {
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile("org.springframework.boot:spring-boot-starter-websocket")
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}")
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
     compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
     testCompile('org.springframework.boot:spring-boot-starter-test')
-
-    // https://mvnrepository.com/artifact/io.reactivex.rxjava2/rxjava
-    compile group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.1.3'
+    testCompile "com.nhaarman:mockito-kotlin:1.5.0"
 
     // https://mvnrepository.com/artifact/io.reactivex/rxkotlin
     compile group: 'io.reactivex', name: 'rxkotlin', version: '0.21.0'
@@ -65,6 +64,7 @@ dependencies {
     compile("org.webjars:stomp-websocket:2.3.3")
     compile("org.webjars:bootstrap:3.3.7")
     compile("org.webjars:jquery:3.1.0")
+    compile("com.mashape.unirest:unirest-java:1.4.9")
 }
 
 task buildDocker(type: Docker, dependsOn: build) {

@@ -1,11 +1,11 @@
 package li.brianv.bidtactoe.gameservice.game.player
 
-import li.brianv.bidtactoe.gameservice.GameRestController
 import li.brianv.bidtactoe.gameservice.game.EMPTY_SPACE
+import li.brianv.bidtactoe.gameservice.game.GameManager
 import java.util.*
 import kotlin.collections.ArrayList
 
-class NormalDistPlayer(gameRestController: GameRestController) : AIPlayer(gameRestController) {
+class NormalDistPlayer(gameManager: GameManager) : AIPlayer(gameManager) {
 
     private val random = Random()
 
@@ -16,7 +16,7 @@ class NormalDistPlayer(gameRestController: GameRestController) : AIPlayer(gameRe
         val mean = 25
         val std = 10
 
-        return Math.min(((random.nextGaussian() * std) + mean).toInt(), biddingPower)
+        return Math.max(Math.min(((random.nextGaussian() * std) + mean).toInt(), biddingPower), 0)
     }
 
     /**
@@ -28,6 +28,6 @@ class NormalDistPlayer(gameRestController: GameRestController) : AIPlayer(gameRe
             if (cells[i] == EMPTY_SPACE)
                 openPositions.add(i)
         }
-        return openPositions[(Math.random() * cells.length).toInt()]
+        return openPositions[(Math.random() * openPositions.size).toInt()]
     }
 }

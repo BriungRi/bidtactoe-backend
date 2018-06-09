@@ -24,6 +24,14 @@ class GameRestController(val gameManager: GameManager, val userRepository: UserR
     }
 
     @RequestMapping(method = [(RequestMethod.POST)],
+            value = ["/add_ai"],
+            consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
+    fun addAI() {
+        logger.info("Add AI")
+        gameManager.addAI()
+    }
+
+    @RequestMapping(method = [(RequestMethod.POST)],
             value = ["/leave_queue"],
             consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
     fun leaveQueue(username: String) {
@@ -35,7 +43,6 @@ class GameRestController(val gameManager: GameManager, val userRepository: UserR
             value = ["/bid"],
             consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
     fun bid(username: String, gameIndex: Int, bidAmt: Int) {
-        logger.info("Bid: username: $username, gameIndex: $gameIndex, bidAmt: $bidAmt")
         gameManager.bid(username, gameIndex, bidAmt)
     }
 

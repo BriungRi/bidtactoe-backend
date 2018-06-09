@@ -7,7 +7,7 @@ import org.mockito.Mockito.mock
 
 class GameTest {
 
-    private val game: Game = Game(mock(Player::class.java), mock(Player::class.java))
+    private val game = Game(mock(Player::class.java), mock(Player::class.java))
 
     @Test
     fun getGameIsOver_notOver() {
@@ -23,6 +23,20 @@ class GameTest {
         game.move("    X    ")
         game.move("    XX   ")
         game.move("   XXX   ")
+        assert(game.gameIsOver)
+    }
+
+    @Test
+    fun getGameIsOver_gameOver_tie() {
+        game.move("    X    ")
+        game.move("    XX   ")
+        game.move("   OXX   ")
+        game.move("  OOXX   ")
+        game.move(" XOOXX   ")
+        game.move("XXOOXX   ")
+        game.move("XXOOXXX  ")
+        game.move("XXOOXXXO ")
+        game.move("XXOOXXXOO")
         assert(game.gameIsOver)
     }
 

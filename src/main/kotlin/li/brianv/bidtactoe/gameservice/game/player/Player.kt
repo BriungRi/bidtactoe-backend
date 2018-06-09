@@ -46,6 +46,5 @@ abstract class Player {
 
     fun resetBidParameters() {
         madeBid = false
-        bidAmt = 0
     }
 }

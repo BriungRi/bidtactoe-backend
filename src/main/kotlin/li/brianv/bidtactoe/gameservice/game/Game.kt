@@ -5,6 +5,7 @@ import li.brianv.bidtactoe.gameservice.exceptions.PlayerGameMismatchException
 import li.brianv.bidtactoe.gameservice.game.player.Player
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import kotlin.concurrent.thread
 
 const val NO_WINNER_USERNAME = "no_winner"
 const val EMPTY_SPACE = ' '
@@ -48,7 +49,11 @@ class Game(private val playerOne: Player,
 
     private fun handleBid(player: Player, bidAmt: Int) {
         player.makeBid(bidAmt)
-        if (bothPlayersMadeBids()) {
+        if (gameOver()) {
+            return
+        } else if (bothPlayersMadeBids()) {
+            playerOne.resetBidParameters()
+            playerTwo.resetBidParameters()
             when (getBidWinnerUsername()) {
                 playerOne.username -> {
                     playerOne.winnerBidUpdate()
@@ -63,8 +68,6 @@ class Game(private val playerOne: Player,
                     playerTwo.tieBidUpdate()
                 }
             }
-            playerOne.resetBidParameters()
-            playerTwo.resetBidParameters()
         }
     }
 
@@ -91,6 +94,7 @@ class Game(private val playerOne: Player,
                 playerTwo.onGameOver(gameWinnerUsername)
                 gameIsOver = true
             }
+
         } else {
             throw IllegalMoveException()
         }
