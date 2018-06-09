@@ -6,10 +6,10 @@ import com.mongodb.client.model.IndexOptions
 import com.mongodb.client.model.Indexes
 import li.brianv.bidtactoe.gameservice.exceptions.EmailAlreadyExistsException
 import li.brianv.bidtactoe.gameservice.exceptions.UsernameAlreadyExistsException
-import li.brianv.bidtactoe.gameservice.model.DEFAULT_RATING
-import li.brianv.bidtactoe.gameservice.model.NewUser
-import li.brianv.bidtactoe.gameservice.model.User
-import li.brianv.bidtactoe.gameservice.model.UserCredentials
+import li.brianv.bidtactoe.gameservice.model.user.DEFAULT_RATING
+import li.brianv.bidtactoe.gameservice.model.user.NewUser
+import li.brianv.bidtactoe.gameservice.model.user.User
+import li.brianv.bidtactoe.gameservice.model.user.UserCredentials
 import li.brianv.bidtactoe.gameservice.mongo.MongoConnectionService
 import org.bson.Document
 import org.slf4j.Logger

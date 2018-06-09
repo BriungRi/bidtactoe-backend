@@ -5,28 +5,38 @@ import org.riversun.fcm.model.EntityMessage
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import kotlin.concurrent.thread
+
+const val GAME_INDEX_KEY: String = "gameIndex"
+const val PLAYER_ONE_KEY: String = "playerOneUsername"
+const val PLAYER_TWO_KEY: String = "playerTwoUsername"
+const val BID_WINNER_KEY: String = "bidWinner"
+const val BID_POWER_KEY: String = "bidPower"
+const val CELLS_KEY: String = "cells"
+const val GAME_WINNER_KEY = "gameWinner"
 
 @Component
 class GameFCMComponent(val fcmClient: FcmClient) {
 
     val logger: Logger = LoggerFactory.getLogger(GameFCMComponent::class.java.simpleName)
-    internal val GAME_INDEX_KEY: String = "gameIndex"
-    internal val PLAYER_ONE_KEY: String = "playerOneId"
-    internal val BID_WINNER_KEY: String = "bidWinner"
-    internal val BID_POWER_KEY: String = "bidPower"
-    internal val CELLS_KEY: String = "cells"
-    internal val GAME_WINNER_KEY = "gameWinner"
 
-    fun gameReadyUpdate(gameIndex: String, playerOneId: String, vararg deviceTokens: String) {
-        logger.info("gameReadyUpdate(): gameIndex: $gameIndex, playerOneId: $playerOneId")
-        sendMessage("$GAME_INDEX_KEY,$PLAYER_ONE_KEY",
-                "$gameIndex,$playerOneId",
-                *deviceTokens)
+    fun gameReadyUpdate(gameIndex: String, playerOneUsername: String, playerTwoUsername: String, deviceToken: String) {
+        thread(start = true) {
+            Thread.sleep(1000)
+            logger.info("gameReadyUpdate(): " +
+                    "gameIndex: $gameIndex, " +
+                    "playerOneUsername: $playerOneUsername, " +
+                    "playerTwoUsername: $playerTwoUsername, " +
+                    "deviceToken: $deviceToken")
+            sendMessage("$GAME_INDEX_KEY,$PLAYER_ONE_KEY,$PLAYER_TWO_KEY",
+                    "$gameIndex,$playerOneUsername,$playerTwoUsername",
+                    deviceToken)
+        }.run()
     }
 
-    fun bidUpdate(bidWinnerId: String, biddingPower: String, deviceToken: String) {
+    fun bidsCompletedUpdate(bidWinnerUsername: String, biddingPower: String, deviceToken: String) {
         sendMessage("$BID_WINNER_KEY,$BID_POWER_KEY",
-                "$bidWinnerId,$biddingPower",
+                "$bidWinnerUsername,$biddingPower",
                 deviceToken)
     }
 
@@ -34,8 +44,8 @@ class GameFCMComponent(val fcmClient: FcmClient) {
         sendMessage(CELLS_KEY, cells, *deviceTokens)
     }
 
-    fun victoryUpdate(winnerId: String, vararg deviceTokens: String) {
-        sendMessage(GAME_WINNER_KEY, winnerId, *deviceTokens)
+    fun victoryUpdate(winnerUsername: String, vararg deviceTokens: String) {
+        sendMessage(GAME_WINNER_KEY, winnerUsername, *deviceTokens)
     }
 
     private fun sendMessage(key: String, value: String, vararg deviceTokens: String) {

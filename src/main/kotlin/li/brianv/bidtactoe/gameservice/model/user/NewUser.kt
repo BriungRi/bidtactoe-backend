@@ -1,4 +1,4 @@
-package li.brianv.bidtactoe.gameservice.model
+package li.brianv.bidtactoe.gameservice.model.user
 
 const val DEFAULT_RATING = 1200
 
