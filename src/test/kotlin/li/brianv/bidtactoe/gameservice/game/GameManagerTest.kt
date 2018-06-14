@@ -1,10 +1,10 @@
 package li.brianv.bidtactoe.gameservice.game
 
-import li.brianv.bidtactoe.gameservice.GameRestController
 import li.brianv.bidtactoe.gameservice.firebase.GameFCMComponent
 import li.brianv.bidtactoe.gameservice.game.player.AndroidPlayer
 import li.brianv.bidtactoe.gameservice.game.player.Player
 import li.brianv.bidtactoe.gameservice.game.player.WebPlayer
+import li.brianv.bidtactoe.gameservice.repository.AIRepository
 import li.brianv.bidtactoe.gameservice.websockets.GameWSComponent
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -16,7 +16,8 @@ class GameManagerTest {
     private val gameArray = ArrayList<Game>()
     private val gameFCMComponent = mock(GameFCMComponent::class.java)
     private val gameWSComponent = mock(GameWSComponent::class.java)
-    private val gameManager = GameManager(playerQueue, gameArray, gameFCMComponent, gameWSComponent)
+    private val aiRepository = mock(AIRepository::class.java)
+    private val gameManager = GameManager(playerQueue, gameArray, gameFCMComponent, gameWSComponent, aiRepository)
 
     @Test
     fun joinGame_oneWebJoin() {

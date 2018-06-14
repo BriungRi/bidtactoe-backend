@@ -5,7 +5,6 @@ import li.brianv.bidtactoe.gameservice.exceptions.PlayerGameMismatchException
 import li.brianv.bidtactoe.gameservice.game.player.Player
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import kotlin.concurrent.thread
 
 const val NO_WINNER_USERNAME = "no_winner"
 const val EMPTY_SPACE = ' '
@@ -30,11 +29,13 @@ class Game(private val playerOne: Player,
     var gameIsOver = false
         private set
 
+    @Synchronized
     fun sendGameReadyUpdate(gameIndex: Int) {
         playerOne.onGameReady(gameIndex, playerOne.username, playerTwo.username)
         playerTwo.onGameReady(gameIndex, playerOne.username, playerTwo.username)
     }
 
+    @Synchronized
     fun bid(username: String, bidAmt: Int) {
         when (username) {
             playerOne.username -> {
@@ -83,6 +84,7 @@ class Game(private val playerOne: Player,
         }
     }
 
+    @Synchronized
     fun move(newCells: String) {
         if (validMove(cells, newCells)) {
             this.cells = newCells

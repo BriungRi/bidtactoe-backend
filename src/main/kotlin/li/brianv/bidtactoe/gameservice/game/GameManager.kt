@@ -1,15 +1,14 @@
 package li.brianv.bidtactoe.gameservice.game
 
 import li.brianv.bidtactoe.gameservice.firebase.GameFCMComponent
-import li.brianv.bidtactoe.gameservice.game.player.AndroidPlayer
-import li.brianv.bidtactoe.gameservice.game.player.NormalDistPlayer
-import li.brianv.bidtactoe.gameservice.game.player.Player
-import li.brianv.bidtactoe.gameservice.game.player.WebPlayer
+import li.brianv.bidtactoe.gameservice.game.player.*
 import li.brianv.bidtactoe.gameservice.model.DeviceType
+import li.brianv.bidtactoe.gameservice.repository.AIRepository
 import li.brianv.bidtactoe.gameservice.websockets.GameWSComponent
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.concurrent.thread
 
 val logger: Logger = LoggerFactory.getLogger(GameManager::class.java.simpleName)
@@ -17,7 +16,10 @@ val logger: Logger = LoggerFactory.getLogger(GameManager::class.java.simpleName)
 class GameManager(private val playerQueue: Queue<Player>,
                   private val gameArray: ArrayList<Game>,
                   private val gameFCMComponent: GameFCMComponent,
-                  private val gameWSComponent: GameWSComponent) {
+                  private val gameWSComponent: GameWSComponent,
+                  private val aiRepository: AIRepository) {
+
+    var numPlayers = 0
 
     fun joinGame(username: String, deviceType: String, deviceToken: String) { // TODO: Synchronize this method?
         when (deviceType) {
@@ -28,13 +30,16 @@ class GameManager(private val playerQueue: Queue<Player>,
     }
 
     fun addAI() {
-        if (!playerQueue.isEmpty()) {
-            playerQueue.add(NormalDistPlayer(this))
-            checkIfGameCanBeCreated()
-        }
+        playerQueue.add(
+                if (numPlayers % 2 == 0)
+                    QLearningPlayer(aiRepository, ArrayList(), ArrayList())
+                else
+                    NormalDistPlayer())
+        checkIfGameCanBeCreated()
     }
 
     private fun checkIfGameCanBeCreated() {
+        numPlayers++
         if (playerQueue.size >= 2) {
             createNewGame()
         }
@@ -70,9 +75,9 @@ class GameManager(private val playerQueue: Queue<Player>,
         }
     }
 
-    fun bid(username: String, gameIndex: Int, bidAmt: Int) {
-        gameArray[gameIndex].bid(username, bidAmt)
-    }
+    fun bid(username: String, gameIndex: Int, bidAmt: Int) =
+            gameArray[gameIndex].bid(username, bidAmt)
 
-    fun makeMove(gameIndex: Int, cells: String) = gameArray[gameIndex].move(cells)
+    fun makeMove(gameIndex: Int, cells: String) =
+            gameArray[gameIndex].move(cells)
 }

@@ -4,15 +4,14 @@ import com.mongodb.MongoClient
 import com.mongodb.MongoClientURI
 import li.brianv.bidtactoe.gameservice.exceptions.MongoNotYetAvailableException
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.stereotype.Service
 import java.util.concurrent.Future
 
+private const val REFRESH_DELAY_IN_MILLIS = 5000L
+
 @Service
-class MongoConnectionService(@Qualifier("mongoTaskScheduler") taskScheduler: TaskScheduler) {
-    private val REFRESH_DELAY_IN_MS = 5000L
+class MongoConnectionService(@Qualifier("driverTaskScheduler") taskScheduler: TaskScheduler) {
     private var mongoConnectionTask: Future<*>? = null
     private var mongoClient: MongoClient? = null
 
@@ -39,6 +38,6 @@ class MongoConnectionService(@Qualifier("mongoTaskScheduler") taskScheduler: Tas
 
             } catch (e: Exception) {
             }
-        }, REFRESH_DELAY_IN_MS)
+        }, REFRESH_DELAY_IN_MILLIS)
     }
 }

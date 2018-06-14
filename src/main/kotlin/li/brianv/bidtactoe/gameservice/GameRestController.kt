@@ -27,7 +27,6 @@ class GameRestController(val gameManager: GameManager, val userRepository: UserR
             value = ["/add_ai"],
             consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
     fun addAI() {
-        logger.info("Add AI")
         gameManager.addAI()
     }
 
@@ -50,7 +49,6 @@ class GameRestController(val gameManager: GameManager, val userRepository: UserR
             value = ["/make_move"],
             consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
     fun makeMove(gameIndex: Int, cells: String) {
-        logger.info("Make Move: gameIndex $gameIndex, cells: $cells")
         gameManager.makeMove(gameIndex, cells)
     }
 
@@ -59,7 +57,6 @@ class GameRestController(val gameManager: GameManager, val userRepository: UserR
             consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
     @ResponseBody
     fun logIn(email: String, password: String): User {
-        logger.info("Log In: email $email, password: $password")
         val user = userRepository.authenticate(email, password)
         if (user != null)
             return user
@@ -72,18 +69,7 @@ class GameRestController(val gameManager: GameManager, val userRepository: UserR
             consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
     @ResponseBody
     fun signUp(username: String, email: String, password: String) {
-        logger.info("Sign Up: username: $username, email $email, password: $password")
         userRepository.createUser(username, email, password)
     }
 
-}
-
-fun String.convertStringToCellsArray(): IntArray {
-    return this.toLowerCase().toCharArray().map {
-        when (it) {
-            'o' -> 1
-            'x' -> 2
-            else -> 0
-        }
-    }.toIntArray()
 }
