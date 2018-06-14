@@ -42,7 +42,7 @@ abstract class AIPlayer() : Player() {
 
     private fun bid(username: String, gameIndex: Int, bidAmt: Int) {
         thread {
-            Unirest.post("http://tactoe.bid:3001/bid")
+            Unirest.post("http://localhost:3001/bid")
                     .header("Content-Type", "application/x-www-form-urlencoded")
                     .header("Cache-Control", "no-cache")
                     .header("Postman-Token", "7dd78a06-d45d-4010-94d9-9c7b827f7a6d")
@@ -53,7 +53,7 @@ abstract class AIPlayer() : Player() {
 
     private fun makeMove(gameIndex: Int, cells: String) {
         thread {
-            Unirest.post("http://tactoe:3001/make_move")
+            Unirest.post("http://localhost:3001/make_move")
                     .header("Content-Type", "application/x-www-form-urlencoded")
                     .header("Cache-Control", "no-cache")
                     .header("Postman-Token", "dcb9f446-75b6-406d-9c75-c10b3ca3a0de")
