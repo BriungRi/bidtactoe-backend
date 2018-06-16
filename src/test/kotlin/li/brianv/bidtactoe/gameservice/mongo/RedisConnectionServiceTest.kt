@@ -16,28 +16,4 @@ class RedisConnectionServiceTest {
         Thread.sleep(1000)
         redisConnectionService.getJedisPool()
     }
-
-    @Test
-    fun funFunc() {
-        val jedisPool = JedisPool(JedisPoolConfig(), "localhost")
-        jedisPool.resource.use {
-            it.set("hello", "world")
-            it.set("fun", "0")
-            println(it.get("fun"))
-            it.incrBy("fun", -5)
-            println(it.get("fun"))
-            if (it.get("noExist") == null)
-                println("Result " + it.get("noexist"))
-            else
-                println("Is null")
-        }
-    }
-
-    @Test
-    fun random() {
-        for(i in 0..10000) {
-            val num = (Math.random() * (10)).roundToInt()
-            assert(num in 0..10)
-        }
-    }
 }

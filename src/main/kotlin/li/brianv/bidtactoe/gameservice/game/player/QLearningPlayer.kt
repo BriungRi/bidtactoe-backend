@@ -9,7 +9,7 @@ private const val MOVE_KEY_PREFIX = "q:move"
 
 private const val LEARNING_RATE = 0.1
 private const val DISCOUNT_FACTOR = 0.1
-private const val PROBABILITY_EXPLORE = 0.4
+private const val PROBABILITY_EXPLORE = 0.30
 private const val REWARD = 1.0
 private const val TIE_REWARD = 0.1
 
@@ -94,13 +94,11 @@ class QLearningPlayer(private val aiRepository: AIRepository,
         val didWin = this.username == winnerUsername
         val didTie = winnerUsername == NO_WINNER_USERNAME
         aiRepository.incrNumGames()
-        if (isPlayerOne) {
-            logger.info("AI " + if (didWin) "won" else if(didTie) "tie" else "lost")
-            updateBidQValues(didWin, didTie)
-            updateMoveQValues(didWin, didTie)
-            if (didWin)
-                aiRepository.incrWins()
-        }
+        logger.info("AI " + if (didWin) "won" else if (didTie) "tie" else "lost")
+        updateBidQValues(didWin, didTie)
+        updateMoveQValues(didWin, didTie)
+        if (didWin)
+            aiRepository.incrWins()
     }
 
     private fun updateBidQValues(didWin: Boolean, didTie: Boolean) {

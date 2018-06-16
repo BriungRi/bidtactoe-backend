@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@CrossOrigin(origins = ["http://localhost:3000", "http://tactoe.bid"])
+@CrossOrigin(origins = ["http://localhost:3000", "http://tactoe.bid", "http://localhost:3001"])
 @RestController
 class GameRestController(val gameManager: GameManager, val userRepository: UserRepository) {
 
@@ -19,7 +19,6 @@ class GameRestController(val gameManager: GameManager, val userRepository: UserR
             value = ["/join_game"],
             consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
     fun joinGame(username: String, deviceType: String, deviceToken: String) {
-        logger.info("Join Game: username: $username, deviceType: $deviceType, deviceToken: $deviceToken")
         gameManager.joinGame(username, deviceType, deviceToken)
     }
 
@@ -34,7 +33,6 @@ class GameRestController(val gameManager: GameManager, val userRepository: UserR
             value = ["/leave_queue"],
             consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
     fun leaveQueue(username: String) {
-        logger.info("Leave Queue: username: $username")
         gameManager.leaveQueue(username)
     }
 
