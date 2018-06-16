@@ -36,6 +36,9 @@ class GameManager(private val playerQueue: Queue<Player>,
                 else
                     NormalDistPlayer())
         checkIfGameCanBeCreated()
+
+        if (numPlayers % 100 == 0)
+            outputAIPerformance()
     }
 
     private fun checkIfGameCanBeCreated() {
@@ -64,6 +67,15 @@ class GameManager(private val playerQueue: Queue<Player>,
                 return i
         }
         return gameArray.size
+    }
+
+    private fun outputAIPerformance() {
+        val numGames = aiRepository.getNumGames()
+        val numWins = aiRepository.getNumWins()
+        val winRate = (numWins / numGames) * 100
+        logger.info("Total games: $numGames")
+        logger.info("Total wins: $numWins")
+        logger.info("Win rate: $winRate%")
     }
 
     fun leaveQueue(username: String) {

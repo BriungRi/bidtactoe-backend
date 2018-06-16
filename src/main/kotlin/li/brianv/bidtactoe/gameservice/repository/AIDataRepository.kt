@@ -70,7 +70,7 @@ class AIDataRepository(private val redisConnectionService: RedisConnectionServic
         }
     }
 
-    override fun incrWins() {
+    override fun incrNumWins() {
         val jedisPool = redisConnectionService.getJedisPool()
         jedisPool.resource.use {
             it.incr("q:numWins")
@@ -84,4 +84,21 @@ class AIDataRepository(private val redisConnectionService: RedisConnectionServic
         }
     }
 
+    override fun getNumWins(): Int {
+        val jedisPool = redisConnectionService.getJedisPool()
+        var numWins = 0
+        jedisPool.resource.use {
+            numWins = it.get("q:numWins").toInt()
+        }
+        return numWins
+    }
+
+    override fun getNumGames(): Int {
+        val jedisPool = redisConnectionService.getJedisPool()
+        var numGames = 0
+        jedisPool.resource.use {
+            numGames = it.get("q:numGames").toInt()
+        }
+        return numGames
+    }
 }

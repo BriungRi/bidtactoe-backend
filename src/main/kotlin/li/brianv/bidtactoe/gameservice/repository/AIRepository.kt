@@ -12,7 +12,11 @@ interface AIRepository {
 
     fun incrMoveQValue(key: String, incrAmt: Double)
 
-    fun incrWins()
+    fun incrNumWins()
 
     fun incrNumGames()
+
+    fun getNumWins(): Int
+
+    fun getNumGames(): Int
 }

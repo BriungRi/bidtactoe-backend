@@ -94,11 +94,10 @@ class QLearningPlayer(private val aiRepository: AIRepository,
         val didWin = this.username == winnerUsername
         val didTie = winnerUsername == NO_WINNER_USERNAME
         aiRepository.incrNumGames()
-        logger.info("AI " + if (didWin) "won" else if (didTie) "tie" else "lost")
         updateBidQValues(didWin, didTie)
         updateMoveQValues(didWin, didTie)
         if (didWin)
-            aiRepository.incrWins()
+            aiRepository.incrNumWins()
     }
 
     private fun updateBidQValues(didWin: Boolean, didTie: Boolean) {
