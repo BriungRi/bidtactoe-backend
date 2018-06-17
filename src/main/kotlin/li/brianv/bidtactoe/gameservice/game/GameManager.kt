@@ -37,7 +37,7 @@ class GameManager(private val playerQueue: Queue<Player>,
                     NormalDistPlayer())
         checkIfGameCanBeCreated()
 
-        if (numPlayers % 100 == 0)
+        if (numPlayers % 1200 == 0) // Output every 10 minutes. 60 games a minute, 600 games every 10 minutes, 1200 players every 10 minutes
             outputAIPerformance()
     }
 
@@ -70,8 +70,8 @@ class GameManager(private val playerQueue: Queue<Player>,
     }
 
     private fun outputAIPerformance() {
-        val numGames = aiRepository.getNumGames()
-        val numWins = aiRepository.getNumWins()
+        val numGames = aiRepository.getNumGames().toDouble()
+        val numWins = aiRepository.getNumWins().toDouble()
         val winRate = (numWins / numGames) * 100
         logger.info("Total games: $numGames")
         logger.info("Total wins: $numWins")

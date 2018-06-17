@@ -1,5 +1,7 @@
 package li.brianv.bidtactoe.gameservice.repository
 
+import li.brianv.bidtactoe.gameservice.game.PLAYER_ONE_PIECE
+import li.brianv.bidtactoe.gameservice.game.PLAYER_TWO_PIECE
 import li.brianv.bidtactoe.gameservice.redis.RedisConnectionService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -28,45 +30,58 @@ class AIDataRepository(private val redisConnectionService: RedisConnectionServic
         return qValue
     }
 
-    override fun getBidQValue(biddingPower: Int, cells: String, bidAmt: Int): Double {
-        val jedisPool = redisConnectionService.getJedisPool()
-        var qValue = DEFAULT_Q_VALUE
-        jedisPool.resource.use {
-            val result = it.get("$BID_KEY_PREFIX:$biddingPower:$cells:$bidAmt")
-            qValue = if (result == null) {
-                it.set("$BID_KEY_PREFIX:$biddingPower:$cells:$bidAmt", DEFAULT_Q_VALUE.toString())
-                DEFAULT_Q_VALUE
-            } else
-                result.toDouble()
-        }
-        return qValue
-    }
+    // TODO: Can reduce ensureKeysExist + method into a single transaction
 
-    override fun getMoveQValue(biddingPower: Int, cells: String, nextCells: String): Double {
+    override fun getBestBidAmtByQValue(biddingPower: Int, cells: String): Pair<Int, Double> {
         val jedisPool = redisConnectionService.getJedisPool()
-        var qValue = DEFAULT_Q_VALUE
+        val bidRange = 0..biddingPower
+        val keys = bidRange.map { bidAmt -> "$BID_KEY_PREFIX:$biddingPower:$cells:$bidAmt" }.toTypedArray()
+        ensureKeysExist(*keys)
         jedisPool.resource.use {
-            val result = it.get("$MOVE_KEY_PREFIX:$biddingPower:$cells:$nextCells")
-            qValue = if (result == null) {
-                it.set("$MOVE_KEY_PREFIX:$biddingPower:$cells:$nextCells", DEFAULT_Q_VALUE.toString())
-                DEFAULT_Q_VALUE
-            } else
-                result.toDouble()
-        }
-        return qValue
-    }
-
-    override fun incrBidQValue(key: String, incrAmt: Double) {
-        val jedisPool = redisConnectionService.getJedisPool()
-        jedisPool.resource.use {
-            it.incrByFloat(key, incrAmt).toDouble()
+            val qValues = it.mget(*keys).map { it.toDouble() }.toTypedArray()
+            return bidRange.zip(qValues).maxBy { it.second } ?: Pair(0, 0.0)
         }
     }
 
-    override fun incrMoveQValue(key: String, incrAmt: Double) {
+    override fun getBestOpenPositionByQValue(biddingPower: Int, cells: String, openPositions: List<Int>, isPlayerOne: Boolean): Pair<Int, Double> {
+        val jedisPool = redisConnectionService.getJedisPool()
+        val nextCellsList = openPositions.map { getNextCells(cells, it, isPlayerOne) }
+        val keys = nextCellsList.map { nextCells -> "$MOVE_KEY_PREFIX:$biddingPower:$cells:$nextCells" }.toTypedArray()
+        ensureKeysExist(*keys)
+        jedisPool.resource.use {
+            val qValues = it.mget(*keys).map { it.toDouble() }.toTypedArray()
+            return openPositions.zip(qValues).maxBy { it.second } ?: Pair(openPositions.first(), 0.0)
+        }
+    }
+
+    private fun getNextCells(oldCells: String, openPosition: Int, isPlayerOne: Boolean): String {
+        return oldCells.substring(0, openPosition) +
+                getPlayerPiece(isPlayerOne) +
+                oldCells.substring(openPosition + 1)
+    }
+
+    private fun getPlayerPiece(isPlayerOne: Boolean): Char {
+        return if (isPlayerOne) PLAYER_ONE_PIECE else PLAYER_TWO_PIECE
+    }
+
+    private fun ensureKeysExist(vararg keys: String) {
         val jedisPool = redisConnectionService.getJedisPool()
         jedisPool.resource.use {
-            it.incrByFloat(key, incrAmt).toDouble()
+            val transaction = it.multi()
+            for (key in keys) {
+                transaction.incrByFloat(key, 0.0)
+            }
+            transaction.exec()
+        }
+    }
+
+    override fun incrQValues(keyToIncrAmt: Map<String, Double>) {
+        val jedisPool = redisConnectionService.getJedisPool()
+        jedisPool.resource.use {
+            val transaction = it.multi()
+            for ((key, incrAmt) in keyToIncrAmt)
+                transaction.incrByFloat(key, incrAmt)
+            transaction.exec()
         }
     }
 

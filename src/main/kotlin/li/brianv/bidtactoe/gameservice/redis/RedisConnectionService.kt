@@ -23,7 +23,7 @@ class RedisConnectionService(@Qualifier("driverTaskScheduler") taskScheduler: Ta
     }
 
     private fun connectToRedis() {
-        jedisPool = JedisPool(JedisPoolConfig(), "btt-redis")
+        jedisPool = JedisPool(JedisPoolConfig(), "redis")
     }
 
     init {

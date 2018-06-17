@@ -2,6 +2,7 @@ package li.brianv.bidtactoe.gameservice.game.player
 
 import com.nhaarman.mockito_kotlin.mock
 import org.junit.Test
+import redis.clients.jedis.JedisPool
 
 class QLearningPlayerTest {
 

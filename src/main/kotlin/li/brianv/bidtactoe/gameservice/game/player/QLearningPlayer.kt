@@ -1,6 +1,7 @@
 package li.brianv.bidtactoe.gameservice.game.player
 
-import li.brianv.bidtactoe.gameservice.game.*
+import li.brianv.bidtactoe.gameservice.game.EMPTY_SPACE
+import li.brianv.bidtactoe.gameservice.game.NO_WINNER_USERNAME
 import li.brianv.bidtactoe.gameservice.repository.AIRepository
 import kotlin.math.roundToInt
 
@@ -14,27 +15,18 @@ private const val REWARD = 1.0
 private const val TIE_REWARD = 0.1
 
 class QLearningPlayer(private val aiRepository: AIRepository,
-                      private val bidActions: MutableList<String>,
-                      private val moveActions: MutableList<String>) : AIPlayer() {
+                      private val bidActionKeys: MutableList<String>,
+                      private val moveActionKeys: MutableList<String>) : AIPlayer() {
 
     override fun getBidAmt(biddingPower: Int, cells: String): Int {
-        var bestBidAmt = Integer.MIN_VALUE
-        var bestQValue = Double.NEGATIVE_INFINITY
-        for (bidAmt in 0..biddingPower) {
-            val qValue = aiRepository.getBidQValue(biddingPower, cells, bidAmt)
-            if (qValue > bestQValue) {
-                bestBidAmt = bidAmt
-                bestQValue = qValue
-            }
-        }
+        val bestBidAmt = aiRepository.getBestBidAmtByQValue(biddingPower, cells).first
         return if (shouldExplore()) {
-            val action = (Math.random() * (biddingPower)).roundToInt()
-            bidActions.add("$BID_KEY_PREFIX:$biddingPower:$cells:$action")
-            action
+            val randomBidAmt = (Math.random() * (biddingPower)).roundToInt()
+            bidActionKeys.add("$BID_KEY_PREFIX:$biddingPower:$cells:$randomBidAmt")
+            randomBidAmt
         } else {
-            val action = bestBidAmt
-            bidActions.add("$BID_KEY_PREFIX:$biddingPower:$cells:$action")
-            action
+            bidActionKeys.add("$BID_KEY_PREFIX:$biddingPower:$cells:$bestBidAmt")
+            bestBidAmt
         }
     }
 
@@ -44,29 +36,14 @@ class QLearningPlayer(private val aiRepository: AIRepository,
 
     override fun getMoveIndex(biddingPower: Int, cells: String): Int {
         val openPositions = getOpenPositions(cells)
-        if (openPositions.isEmpty())
-            return -1
-
-        var bestOpenPosition = openPositions[0]
-        var bestQValue = Double.NEGATIVE_INFINITY
-
-        for (openPosition in openPositions) {
-            val nextCells = getNextCells(cells, openPosition)
-            val qValue = aiRepository.getMoveQValue(biddingPower, cells, nextCells)
-            if (qValue > bestQValue) {
-                bestOpenPosition = openPosition
-                bestQValue = qValue
-            }
-        }
+        val bestOpenPosition = aiRepository.getBestOpenPositionByQValue(biddingPower, cells, openPositions, isPlayerOne).first
         return if (shouldExplore()) {
-            val action = openPositions[(Math.random() * openPositions.size).toInt()]
-            moveActions.add("$MOVE_KEY_PREFIX:$biddingPower:$cells:$action")
-            action
+            val randomOpenPosition = openPositions[(Math.random() * openPositions.size).toInt()]
+            moveActionKeys.add("$MOVE_KEY_PREFIX:$biddingPower:$cells:$randomOpenPosition")
+            randomOpenPosition
         } else {
-            val action = bestOpenPosition
-            val nextCells = getNextCells(cells, action)
-            moveActions.add("$MOVE_KEY_PREFIX:$biddingPower:$cells:$nextCells")
-            action
+            moveActionKeys.add("$MOVE_KEY_PREFIX:$biddingPower:$cells:$bestOpenPosition")
+            bestOpenPosition
         }
     }
 
@@ -77,16 +54,6 @@ class QLearningPlayer(private val aiRepository: AIRepository,
                 openPositions.add(i)
         }
         return openPositions
-    }
-
-    private fun getPlayerPiece(isPlayerOne: Boolean): Char {
-        return if (isPlayerOne) PLAYER_ONE_PIECE else PLAYER_TWO_PIECE
-    }
-
-    private fun getNextCells(oldCells: String, openPosition: Int): String {
-        return oldCells.substring(0, openPosition) +
-                getPlayerPiece(isPlayerOne) +
-                oldCells.substring(openPosition + 1)
     }
 
     override fun onGameOver(winnerUsername: String) {
@@ -101,63 +68,45 @@ class QLearningPlayer(private val aiRepository: AIRepository,
     }
 
     private fun updateBidQValues(didWin: Boolean, didTie: Boolean) {
-        for (i in 0 until bidActions.size - 1) { // TODO: Need to use onBidsCompleted() to get all data. Right now, forgoing last data point
-            val action = bidActions[i]
-            val nextAction = bidActions[i + 1]
+        val keyToIncrAmt = HashMap<String, Double>()
+        for (i in 0 until bidActionKeys.size - 1) {
+            val action = bidActionKeys[i]
+            val nextAction = bidActionKeys[i + 1]
             val reward = if (didWin) REWARD else if (didTie) TIE_REWARD else -REWARD
             val qValue = aiRepository.getQValue(action)
             val qValueIncrAmt = LEARNING_RATE * (reward + (DISCOUNT_FACTOR * getMaxBidQValue(nextAction) - qValue))
-            aiRepository.incrBidQValue(action, qValueIncrAmt)
+            keyToIncrAmt[action] = qValueIncrAmt
         }
+        aiRepository.incrQValues(keyToIncrAmt)
     }
 
-    // TODO: Duplicate code here
     private fun getMaxBidQValue(key: String): Double {
-        val cmpnts = key.split(":")
-        val biddingPower = cmpnts[2].toInt()
-        val cells = cmpnts[3]
-        var bestQValue = Double.NEGATIVE_INFINITY
-        for (bidAmt in 0..biddingPower) {
-            val qValue = aiRepository.getBidQValue(biddingPower, cells, bidAmt)
-            if (qValue > bestQValue) {
-                bestQValue = qValue
-            }
-        }
-        return bestQValue
+        val keyComponents = key.split(":")
+        val biddingPower = keyComponents[2].toInt()
+        val cells = keyComponents[3]
+        return aiRepository.getBestBidAmtByQValue(biddingPower, cells).second
     }
 
     private fun updateMoveQValues(didWin: Boolean, didTie: Boolean) {
-        for (i in 0 until moveActions.size - 1) { // TODO: Need to use onMovesCompleted() to get all data. Right now, forgoing last data point
-            val action = moveActions[i]
-            val nextAction = moveActions[i + 1]
+        val keyToIncrAmt = HashMap<String, Double>()
+        for (i in 0 until moveActionKeys.size - 1) { // TODO: Need to use onMovesCompleted() to get all data. Right now, forgoing last data point
+            val action = moveActionKeys[i]
+            val nextAction = moveActionKeys[i + 1]
             val reward = if (didWin) REWARD else if (didTie) TIE_REWARD else -REWARD
             val qValue = aiRepository.getQValue(action)
             val qValueIncrAmt = LEARNING_RATE * (reward + (DISCOUNT_FACTOR * getMaxMoveQValue(nextAction) - qValue))
-            aiRepository.incrMoveQValue(action, qValueIncrAmt)
+            keyToIncrAmt[action] = qValueIncrAmt
         }
+        aiRepository.incrQValues(keyToIncrAmt)
     }
 
-    // TODO: Duplicate code here
     private fun getMaxMoveQValue(key: String): Double {
-        val cmpnts = key.split(":")
-        val biddingPower = cmpnts[2].toInt()
-        val cells = cmpnts[3]
+        val keyComponents = key.split(":")
+        val biddingPower = keyComponents[2].toInt()
+        val cells = keyComponents[3]
 
         val openPositions = getOpenPositions(cells)
-        if (openPositions.isEmpty())
-            return 0.0
-
-        var bestQValue = Double.NEGATIVE_INFINITY
-
-        for (openPosition in openPositions) {
-            val nextCells = getNextCells(cells, openPosition)
-            val qValue = aiRepository.getMoveQValue(biddingPower, cells, nextCells)
-            if (qValue > bestQValue) {
-                bestQValue = qValue
-            }
-        }
-
-        return bestQValue
+        return aiRepository.getBestOpenPositionByQValue(biddingPower, cells, openPositions, isPlayerOne).second
     }
 
 }

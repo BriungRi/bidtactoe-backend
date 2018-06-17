@@ -4,13 +4,11 @@ interface AIRepository {
 
     fun getQValue(key: String): Double
 
-    fun getBidQValue(biddingPower: Int, cells: String, bidAmt: Int): Double
+    fun getBestBidAmtByQValue(biddingPower: Int, cells: String): Pair<Int, Double>
 
-    fun getMoveQValue(biddingPower: Int, cells: String, nextCells: String): Double
+    fun getBestOpenPositionByQValue(biddingPower: Int, cells: String, openPositions: List<Int>, isPlayerOne: Boolean): Pair<Int, Double>
 
-    fun incrBidQValue(key: String, incrAmt: Double)
-
-    fun incrMoveQValue(key: String, incrAmt: Double)
+    fun incrQValues(keyToIncrAmt: Map<String, Double>)
 
     fun incrNumWins()
 
