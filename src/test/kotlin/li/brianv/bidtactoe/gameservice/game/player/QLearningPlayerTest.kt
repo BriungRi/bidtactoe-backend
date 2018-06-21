@@ -1,12 +1,18 @@
 package li.brianv.bidtactoe.gameservice.game.player
 
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
+import li.brianv.bidtactoe.gameservice.repository.AIRepository
 import org.junit.Test
-import redis.clients.jedis.JedisPool
 
 class QLearningPlayerTest {
 
-    private val qLearningPlayer = QLearningPlayer(mock(), mock(), mock())
+    private val aiRepository = mock<AIRepository> {
+        on { getBestBidAmtByQValue(any(), any()) } doReturn Pair(0, 0.0)
+        on { getBestOpenPositionByQValue(any(), any(), any(), any()) } doReturn Pair(4, 0.0)
+    }
+    private val qLearningPlayer = QLearningPlayer(aiRepository, mock(), mock())
 
     @Test
     fun getBidAmt() {
@@ -16,43 +22,5 @@ class QLearningPlayerTest {
         }
     }
 
-    @Test
-    fun getMoveIndex_noMoves() {
-        for (i in 0..100) {
-            val moveIndex = qLearningPlayer.getMoveIndex(5, "        ")
-            assert(moveIndex in 0..8)
-        }
-    }
 
-    @Test
-    fun getMoveIndex_oneMoveX() {
-        for (i in 0..100) {
-            val moveIndex = qLearningPlayer.getMoveIndex(5, "X        ")
-            assert(moveIndex in 1..8)
-        }
-    }
-
-    @Test
-    fun getMoveIndex_oneMoveO() {
-        for (i in 0..100) {
-            val moveIndex = qLearningPlayer.getMoveIndex(5, "O        ")
-            assert(moveIndex in 1..8)
-        }
-    }
-
-    @Test
-    fun getMoveIndex_oneMoveLeftXs() {
-        for (i in 0..100) {
-            val moveIndex = qLearningPlayer.getMoveIndex(5, "XXXX XXXX")
-            assert(moveIndex == 4)
-        }
-    }
-
-    @Test
-    fun getMoveIndex_oneMoveLeftOs() {
-        for (i in 0..100) {
-            val moveIndex = qLearningPlayer.getMoveIndex(5, "OOOO OOOO")
-            assert(moveIndex == 4)
-        }
-    }
 }

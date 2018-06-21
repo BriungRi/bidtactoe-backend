@@ -56,7 +56,7 @@ dependencies {
     compile "org.riversun:fcm:0.2.0"
 
     // MongoDB Driver
-    compile 'org.mongodb:mongo-java-driver:3.6.1'
+    compile 'org.mongodb:mongo-java-driver:3.7.1'
 
     // Redis Driver
     compile group: 'redis.clients', name: 'jedis', version: '2.9.0'

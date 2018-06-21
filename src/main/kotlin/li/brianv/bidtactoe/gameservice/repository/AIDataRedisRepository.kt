@@ -1,20 +1,16 @@
 package li.brianv.bidtactoe.gameservice.repository
 
-import li.brianv.bidtactoe.gameservice.game.PLAYER_ONE_PIECE
-import li.brianv.bidtactoe.gameservice.game.PLAYER_TWO_PIECE
 import li.brianv.bidtactoe.gameservice.redis.RedisConnectionService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Repository
 
 private const val BID_KEY_PREFIX = "q:bid"
 private const val MOVE_KEY_PREFIX = "q:move"
 private const val DEFAULT_Q_VALUE = 0.0
 
-@Repository
-class AIDataRepository(private val redisConnectionService: RedisConnectionService) : AIRepository {
+class AIDataRedisRepository(private val redisConnectionService: RedisConnectionService) : AIRepository {
 
-    val logger: Logger = LoggerFactory.getLogger(AIDataRepository::class.java.simpleName)
+    val logger: Logger = LoggerFactory.getLogger(AIDataRedisRepository::class.java.simpleName)
 
     override fun getQValue(key: String): Double {
         val jedisPool = redisConnectionService.getJedisPool()
@@ -45,23 +41,12 @@ class AIDataRepository(private val redisConnectionService: RedisConnectionServic
 
     override fun getBestOpenPositionByQValue(biddingPower: Int, cells: String, openPositions: List<Int>, isPlayerOne: Boolean): Pair<Int, Double> {
         val jedisPool = redisConnectionService.getJedisPool()
-        val nextCellsList = openPositions.map { getNextCells(cells, it, isPlayerOne) }
-        val keys = nextCellsList.map { nextCells -> "$MOVE_KEY_PREFIX:$biddingPower:$cells:$nextCells" }.toTypedArray()
+        val keys = openPositions.map { openPosition -> "$MOVE_KEY_PREFIX:$biddingPower:$cells:$openPosition" }.toTypedArray()
         ensureKeysExist(*keys)
         jedisPool.resource.use {
             val qValues = it.mget(*keys).map { it.toDouble() }.toTypedArray()
             return openPositions.zip(qValues).maxBy { it.second } ?: Pair(openPositions.first(), 0.0)
         }
-    }
-
-    private fun getNextCells(oldCells: String, openPosition: Int, isPlayerOne: Boolean): String {
-        return oldCells.substring(0, openPosition) +
-                getPlayerPiece(isPlayerOne) +
-                oldCells.substring(openPosition + 1)
-    }
-
-    private fun getPlayerPiece(isPlayerOne: Boolean): Char {
-        return if (isPlayerOne) PLAYER_ONE_PIECE else PLAYER_TWO_PIECE
     }
 
     private fun ensureKeysExist(vararg keys: String) {

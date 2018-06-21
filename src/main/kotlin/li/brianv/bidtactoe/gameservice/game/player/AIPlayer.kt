@@ -8,7 +8,7 @@ import java.util.*
 import kotlin.concurrent.thread
 
 
-abstract class AIPlayer() : Player() {
+abstract class AIPlayer : Player() {
 
     override val username = ("Guest-" + UUID.randomUUID().toString()).substring(0..13)
     private var gameIndex = -1

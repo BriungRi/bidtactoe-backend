@@ -30,10 +30,6 @@ class QLearningPlayer(private val aiRepository: AIRepository,
         }
     }
 
-    private fun shouldExplore(): Boolean {
-        return Math.random() < PROBABILITY_EXPLORE
-    }
-
     override fun getMoveIndex(biddingPower: Int, cells: String): Int {
         val openPositions = getOpenPositions(cells)
         val bestOpenPosition = aiRepository.getBestOpenPositionByQValue(biddingPower, cells, openPositions, isPlayerOne).first
@@ -45,6 +41,10 @@ class QLearningPlayer(private val aiRepository: AIRepository,
             moveActionKeys.add("$MOVE_KEY_PREFIX:$biddingPower:$cells:$bestOpenPosition")
             bestOpenPosition
         }
+    }
+
+    private fun shouldExplore(): Boolean {
+        return Math.random() < PROBABILITY_EXPLORE
     }
 
     private fun getOpenPositions(cells: String): List<Int> {

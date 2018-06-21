@@ -3,6 +3,8 @@ package li.brianv.bidtactoe.gameservice
 import li.brianv.bidtactoe.gameservice.firebase.GameFCMComponent
 import li.brianv.bidtactoe.gameservice.game.GameManager
 import li.brianv.bidtactoe.gameservice.game.player.Player
+import li.brianv.bidtactoe.gameservice.mongo.MongoConnectionService
+import li.brianv.bidtactoe.gameservice.repository.AIDataMongoRepository
 import li.brianv.bidtactoe.gameservice.repository.AIRepository
 import li.brianv.bidtactoe.gameservice.websockets.GameWSComponent
 import org.riversun.fcm.FcmClient
@@ -12,7 +14,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler
-import redis.clients.jedis.JedisPool
 import java.util.*
 
 @SpringBootApplication
@@ -21,6 +22,11 @@ class GameServiceApplication {
     @Bean
     fun provideGameManager(gameFCMComponent: GameFCMComponent, gameWSComponent: GameWSComponent, aiRepository: AIRepository): GameManager {
         return GameManager(LinkedList<Player>(), ArrayList(), gameFCMComponent, gameWSComponent, aiRepository)
+    }
+
+    @Bean
+    fun provideAIRepository(mongoConnectionService: MongoConnectionService): AIRepository {
+        return AIDataMongoRepository(mongoConnectionService)
     }
 
     @Bean

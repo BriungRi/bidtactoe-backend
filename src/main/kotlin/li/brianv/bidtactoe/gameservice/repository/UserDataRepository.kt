@@ -58,7 +58,7 @@ class UserDataRepository(private val mongoConnectionService: MongoConnectionServ
     }
 
     private fun getUserCollection(): MongoCollection<Document> {
-        val mongoClient = mongoConnectionService.getMongoClient()
+        val mongoClient = mongoConnectionService.getAtlasMongoClient()
         val mongoDatabase = mongoClient.getDatabase(databaseName)
         return mongoDatabase.getCollection(userCollectionName)
     }
