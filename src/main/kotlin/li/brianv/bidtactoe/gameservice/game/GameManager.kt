@@ -73,9 +73,8 @@ class GameManager(private val playerQueue: Queue<Player>,
         val numGames = aiRepository.getNumGames().toDouble()
         val numWins = aiRepository.getNumWins().toDouble()
         val winRate = (numWins / numGames) * 100
-        logger.info("Total games: $numGames")
-        logger.info("Total wins: $numWins")
-        logger.info("Win rate: $winRate%")
+        logger.info("Total games,Total wins,Win rate")
+        logger.info("$numGames,$numWins,$winRate")
     }
 
     fun leaveQueue(username: String) {
