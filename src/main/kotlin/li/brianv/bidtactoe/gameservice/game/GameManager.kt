@@ -2,6 +2,8 @@ package li.brianv.bidtactoe.gameservice.game
 
 import li.brianv.bidtactoe.gameservice.firebase.GameFCMComponent
 import li.brianv.bidtactoe.gameservice.game.player.*
+import li.brianv.bidtactoe.gameservice.game.player.ai.NormalDistPlayer
+import li.brianv.bidtactoe.gameservice.game.player.ai.QLearningPlayer
 import li.brianv.bidtactoe.gameservice.model.DeviceType
 import li.brianv.bidtactoe.gameservice.repository.AIRepository
 import li.brianv.bidtactoe.gameservice.websockets.GameWSComponent

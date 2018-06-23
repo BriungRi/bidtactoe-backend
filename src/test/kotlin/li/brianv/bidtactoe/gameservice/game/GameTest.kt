@@ -1,13 +1,36 @@
 package li.brianv.bidtactoe.gameservice.game
 
+import com.nhaarman.mockito_kotlin.doReturn
+import com.nhaarman.mockito_kotlin.mock
 import li.brianv.bidtactoe.gameservice.exceptions.IllegalMoveException
 import li.brianv.bidtactoe.gameservice.game.player.Player
 import org.junit.Test
-import org.mockito.Mockito.mock
 
+private const val playerOneUsername = "a"
+private const val playerTwoUsername = "b"
 class GameTest {
 
-    private val game = Game(mock(Player::class.java), mock(Player::class.java))
+    private val playerOne = mock<Player> {
+        on { username } doReturn playerOneUsername
+    }
+    private val playerTwo = mock<Player> {
+        on { username } doReturn playerTwoUsername
+    }
+    private val game = Game(playerOne, playerTwo)
+
+    @Test
+    fun bidStalemate() {
+        assert(!game.gameIsOver)
+        game.bid(playerOneUsername, 10)
+        game.bid(playerTwoUsername, 10)
+        assert(!game.gameIsOver)
+        game.bid(playerOneUsername, 10)
+        game.bid(playerTwoUsername, 10)
+        assert(!game.gameIsOver)
+        game.bid(playerOneUsername, 10)
+        game.bid(playerTwoUsername, 10)
+        assert(game.gameIsOver)
+    }
 
     @Test
     fun getGameIsOver_notOver() {

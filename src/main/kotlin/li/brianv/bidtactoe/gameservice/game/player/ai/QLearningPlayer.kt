@@ -1,4 +1,4 @@
-package li.brianv.bidtactoe.gameservice.game.player
+package li.brianv.bidtactoe.gameservice.game.player.ai
 
 import li.brianv.bidtactoe.gameservice.game.EMPTY_SPACE
 import li.brianv.bidtactoe.gameservice.game.NO_WINNER_USERNAME

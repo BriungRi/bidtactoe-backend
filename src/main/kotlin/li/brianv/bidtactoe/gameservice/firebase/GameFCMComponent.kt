@@ -7,13 +7,13 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import kotlin.concurrent.thread
 
-const val GAME_INDEX_KEY: String = "gameIndex"
-const val PLAYER_ONE_KEY: String = "playerOneUsername"
-const val PLAYER_TWO_KEY: String = "playerTwoUsername"
-const val BID_WINNER_KEY: String = "bidWinner"
-const val BID_POWER_KEY: String = "bidPower"
-const val CELLS_KEY: String = "cells"
-const val GAME_WINNER_KEY = "gameWinner"
+private const val GAME_INDEX_KEY: String = "gameIndex"
+private const val PLAYER_ONE_KEY: String = "playerOneUsername"
+private const val PLAYER_TWO_KEY: String = "playerTwoUsername"
+private const val BID_WINNER_KEY: String = "bidWinner"
+private const val BID_POWER_KEY: String = "bidPower"
+private const val CELLS_KEY: String = "cells"
+private const val GAME_WINNER_KEY = "gameWinner"
 
 @Component
 class GameFCMComponent(val fcmClient: FcmClient) {

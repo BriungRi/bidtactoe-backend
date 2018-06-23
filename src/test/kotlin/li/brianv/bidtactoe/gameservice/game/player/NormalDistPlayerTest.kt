@@ -1,5 +1,6 @@
 package li.brianv.bidtactoe.gameservice.game.player
 
+import li.brianv.bidtactoe.gameservice.game.player.ai.NormalDistPlayer
 import org.junit.Test
 
 class NormalDistPlayerTest {
@@ -17,7 +18,7 @@ class NormalDistPlayerTest {
     @Test
     fun getMoveIndex_noMoves() {
         for (i in 0..100) {
-            val moveIndex = normalDistPlayer.getMoveIndex(5, "        ")
+            val moveIndex = normalDistPlayer.getMoveIndex(5, "         ")
             assert(moveIndex in 0..8)
         }
     }

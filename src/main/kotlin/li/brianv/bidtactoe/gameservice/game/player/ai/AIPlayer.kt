@@ -1,9 +1,10 @@
-package li.brianv.bidtactoe.gameservice.game.player
+package li.brianv.bidtactoe.gameservice.game.player.ai
 
 import com.mashape.unirest.http.Unirest
 import li.brianv.bidtactoe.gameservice.game.NO_WINNER_USERNAME
 import li.brianv.bidtactoe.gameservice.game.PLAYER_ONE_PIECE
 import li.brianv.bidtactoe.gameservice.game.PLAYER_TWO_PIECE
+import li.brianv.bidtactoe.gameservice.game.player.Player
 import java.util.*
 import kotlin.concurrent.thread
 

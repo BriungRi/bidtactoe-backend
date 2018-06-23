@@ -1,4 +1,4 @@
-package li.brianv.bidtactoe.gameservice.game.player
+package li.brianv.bidtactoe.gameservice.game.player.ai
 
 import li.brianv.bidtactoe.gameservice.game.EMPTY_SPACE
 import java.util.*
