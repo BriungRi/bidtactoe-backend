@@ -2,6 +2,7 @@ package li.brianv.bidtactoe.gameservice.repository
 
 import com.mongodb.MongoWriteException
 import com.mongodb.client.MongoCollection
+import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.IndexOptions
 import com.mongodb.client.model.Indexes
 import li.brianv.bidtactoe.gameservice.exceptions.EmailAlreadyExistsException
@@ -9,7 +10,6 @@ import li.brianv.bidtactoe.gameservice.exceptions.UsernameAlreadyExistsException
 import li.brianv.bidtactoe.gameservice.model.user.DEFAULT_RATING
 import li.brianv.bidtactoe.gameservice.model.user.NewUser
 import li.brianv.bidtactoe.gameservice.model.user.User
-import li.brianv.bidtactoe.gameservice.model.user.UserCredentials
 import li.brianv.bidtactoe.gameservice.mongo.MongoConnectionService
 import org.bson.Document
 import org.mindrot.jbcrypt.BCrypt.*
@@ -25,7 +25,6 @@ class UserDataRepository(private val mongoConnectionService: MongoConnectionServ
     val logger: Logger = LoggerFactory.getLogger(UserDataRepository::class.java.simpleName)
 
     override fun createUser(username: String, email: String, password: String) {
-        logger.info("createUser()")
         val userCollection = getUserCollection()
         indexCollection(userCollection)
         val hashedPassword = hashpw(password, gensalt())
@@ -48,15 +47,10 @@ class UserDataRepository(private val mongoConnectionService: MongoConnectionServ
     override fun authenticate(email: String, password: String): User? {
         val userCollection = getUserCollection()
         indexCollection(userCollection)
-        val userCredentials = UserCredentials(email, password)
-        val findUser = Document()
-        for (component in UserCredentials::class.memberProperties) {
-            findUser.append(component.name, component.get(userCredentials))
-        }
-        return userCollection.find(findUser)
+        return userCollection.find(eq("email", email))
                 .filter { document -> checkpw(password, document.getString("password")) }
                 .map { document -> User(document.getString("username"), document.getInteger("rating")) }
-                .first()
+                .firstOrNull()
     }
 
     private fun getUserCollection(): MongoCollection<Document> {
