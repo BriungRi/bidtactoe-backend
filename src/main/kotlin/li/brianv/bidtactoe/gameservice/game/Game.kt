@@ -113,7 +113,6 @@ class Game(private val playerOne: Player,
     }
 
     private fun setGameOver(gameWinnerUsername: String) {
-        println("Setting game over")
         playerOne.onGameOver(gameWinnerUsername)
         playerTwo.onGameOver(gameWinnerUsername)
         gameIsOver = true

@@ -12,6 +12,7 @@ import li.brianv.bidtactoe.gameservice.model.user.User
 import li.brianv.bidtactoe.gameservice.model.user.UserCredentials
 import li.brianv.bidtactoe.gameservice.mongo.MongoConnectionService
 import org.bson.Document
+import org.mindrot.jbcrypt.BCrypt.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Repository
@@ -27,7 +28,8 @@ class UserDataRepository(private val mongoConnectionService: MongoConnectionServ
         logger.info("createUser()")
         val userCollection = getUserCollection()
         indexCollection(userCollection)
-        val newUser = NewUser(username, email, password, DEFAULT_RATING)
+        val hashedPassword = hashpw(password, gensalt())
+        val newUser = NewUser(username, email, hashedPassword, DEFAULT_RATING)
         val newUserDocument = Document()
         for (component in NewUser::class.memberProperties) {
             newUserDocument.append(component.name, component.get(newUser))
@@ -41,7 +43,6 @@ class UserDataRepository(private val mongoConnectionService: MongoConnectionServ
                 throw UsernameAlreadyExistsException()
             }
         }
-
     }
 
     override fun authenticate(email: String, password: String): User? {
@@ -53,7 +54,8 @@ class UserDataRepository(private val mongoConnectionService: MongoConnectionServ
             findUser.append(component.name, component.get(userCredentials))
         }
         return userCollection.find(findUser)
-                .map({ document -> User(document.getString("username"), document.getInteger("rating")) })
+                .filter { document -> checkpw(password, document.getString("password")) }
+                .map { document -> User(document.getString("username"), document.getInteger("rating")) }
                 .first()
     }
 

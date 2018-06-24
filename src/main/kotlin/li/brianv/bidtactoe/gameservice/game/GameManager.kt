@@ -1,16 +1,17 @@
 package li.brianv.bidtactoe.gameservice.game
 
 import li.brianv.bidtactoe.gameservice.firebase.GameFCMComponent
-import li.brianv.bidtactoe.gameservice.game.player.*
-import li.brianv.bidtactoe.gameservice.game.player.ai.NormalDistPlayer
+import li.brianv.bidtactoe.gameservice.game.player.AndroidPlayer
+import li.brianv.bidtactoe.gameservice.game.player.Player
+import li.brianv.bidtactoe.gameservice.game.player.WebPlayer
 import li.brianv.bidtactoe.gameservice.game.player.ai.QLearningPlayer
+import li.brianv.bidtactoe.gameservice.game.player.ai.SmartNormalDistPlayer
 import li.brianv.bidtactoe.gameservice.model.DeviceType
 import li.brianv.bidtactoe.gameservice.repository.AIRepository
 import li.brianv.bidtactoe.gameservice.websockets.GameWSComponent
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.concurrent.thread
 
 val logger: Logger = LoggerFactory.getLogger(GameManager::class.java.simpleName)
@@ -21,7 +22,7 @@ class GameManager(private val playerQueue: Queue<Player>,
                   private val gameWSComponent: GameWSComponent,
                   private val aiRepository: AIRepository) {
 
-    var numPlayers = 0
+    private var numPlayers = 0
 
     fun joinGame(username: String, deviceType: String, deviceToken: String) { // TODO: Synchronize this method?
         when (deviceType) {
@@ -36,7 +37,7 @@ class GameManager(private val playerQueue: Queue<Player>,
                 if (numPlayers % 2 == 0)
                     QLearningPlayer(aiRepository, ArrayList(), ArrayList())
                 else
-                    NormalDistPlayer())
+                    SmartNormalDistPlayer())
         checkIfGameCanBeCreated()
 
         if (numPlayers % 1200 == 0) // Output every 10 minutes. 60 games a minute, 600 games every 10 minutes, 1200 players every 10 minutes

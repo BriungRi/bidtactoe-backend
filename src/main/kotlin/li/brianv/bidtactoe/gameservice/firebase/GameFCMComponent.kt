@@ -23,11 +23,6 @@ class GameFCMComponent(val fcmClient: FcmClient) {
     fun gameReadyUpdate(gameIndex: String, playerOneUsername: String, playerTwoUsername: String, deviceToken: String) {
         thread(start = true) {
             Thread.sleep(1000)
-            logger.info("gameReadyUpdate(): " +
-                    "gameIndex: $gameIndex, " +
-                    "playerOneUsername: $playerOneUsername, " +
-                    "playerTwoUsername: $playerTwoUsername, " +
-                    "deviceToken: $deviceToken")
             sendMessage("$GAME_INDEX_KEY,$PLAYER_ONE_KEY,$PLAYER_TWO_KEY",
                     "$gameIndex,$playerOneUsername,$playerTwoUsername",
                     deviceToken)
