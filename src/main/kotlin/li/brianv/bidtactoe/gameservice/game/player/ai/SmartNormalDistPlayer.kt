@@ -106,6 +106,23 @@ class SmartNormalDistPlayer : AIPlayer() {
             if (isPlayerOne && sum == -2 || !isPlayerOne && sum == 2)
                 return winPosition.first { position -> cells[position] == EMPTY_SPACE } // Return blocking position
         }
+        for (winPosition in WIN_POSITIONS) {
+            val winPositionCells = winPosition.map { position ->
+                cells[position]
+            }
+            val numSpaces = winPositionCells.map { winPositionCell ->
+                when (winPositionCell) {
+                    PLAYER_ONE_PIECE -> 0
+                    PLAYER_TWO_PIECE -> 0
+                    else -> {
+                        1
+                    }
+                }
+            }.sum()
+            if ((isPlayerOne && numSpaces == 2 && winPositionCells.contains(PLAYER_ONE_PIECE)) ||
+                            (!isPlayerOne && numSpaces == 2 && winPositionCells.contains(PLAYER_TWO_PIECE)))
+                return winPosition.first { position -> cells[position] == EMPTY_SPACE }
+        }
         return if (cells[4] == EMPTY_SPACE)
             4
         else {

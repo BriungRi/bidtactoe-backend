@@ -37,7 +37,8 @@ class GameManager(private val playerQueue: Queue<Player>,
                 if (numPlayers % 2 == 0)
                     QLearningPlayer(aiRepository, ArrayList(), ArrayList())
                 else
-                    SmartNormalDistPlayer())
+                    SmartNormalDistPlayer()
+        )
         checkIfGameCanBeCreated()
 
         if (numPlayers % 1200 == 0) // Output every 10 minutes. 60 games a minute, 600 games every 10 minutes, 1200 players every 10 minutes

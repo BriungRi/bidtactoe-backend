@@ -60,6 +60,17 @@ class SmartNormalDistPlayerTest {
         }
     }
 
+    @Test
+    fun getMoveIndex_playerHasOneDown() {
+        val biddingPower = 150
+        val cases = arrayOf("X        ", "   X     ", "      X  ")
+        val expected = arrayOf(1, 4, 7)
+        for (case in cases.zip(expected)) {
+            val moveIndex = smartNormalDistPlayer.getMoveIndex(biddingPower, case.first)
+            assert(moveIndex == case.second)
+        }
+    }
+
     /* Validity tests */
 
     @Test
