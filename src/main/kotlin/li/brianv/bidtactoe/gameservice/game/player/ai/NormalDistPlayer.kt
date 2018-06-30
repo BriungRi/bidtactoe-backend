@@ -4,7 +4,7 @@ import li.brianv.bidtactoe.gameservice.game.EMPTY_SPACE
 import java.util.*
 import kotlin.collections.ArrayList
 
-class NormalDistPlayer : AIPlayer() {
+open class NormalDistPlayer : AIPlayer() {
 
     private val random = Random()
 

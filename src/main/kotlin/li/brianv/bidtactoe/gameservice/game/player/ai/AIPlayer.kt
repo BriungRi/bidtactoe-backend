@@ -1,9 +1,7 @@
 package li.brianv.bidtactoe.gameservice.game.player.ai
 
 import com.mashape.unirest.http.Unirest
-import li.brianv.bidtactoe.gameservice.game.NO_WINNER_USERNAME
-import li.brianv.bidtactoe.gameservice.game.PLAYER_ONE_PIECE
-import li.brianv.bidtactoe.gameservice.game.PLAYER_TWO_PIECE
+import li.brianv.bidtactoe.gameservice.game.*
 import li.brianv.bidtactoe.gameservice.game.player.Player
 import java.util.*
 import kotlin.concurrent.thread
@@ -63,10 +61,109 @@ abstract class AIPlayer : Player() {
         }
     }
 
-    override fun onGameOver(winnerUsername: String) {
-    }
+    override fun onGameOver(winnerUsername: String) {}
 
     abstract fun getBidAmt(biddingPower: Int, cells: String): Int
 
     abstract fun getMoveIndex(biddingPower: Int, cells: String): Int
+
+    fun getWinningBid(biddingPower: Int, cells: String): Int? {
+        for (winPosition in WIN_POSITIONS) {
+            val sum = winPosition.map { position ->
+                when (cells[position]) {
+                    PLAYER_ONE_PIECE -> 1
+                    PLAYER_TWO_PIECE -> -1
+                    else -> {
+                        0
+                    }
+                }
+            }.sum()
+
+            if ((isPlayerOne && sum == 2) || (!isPlayerOne && sum == -2)) {
+                return biddingPower
+            }
+        }
+        return null
+    }
+
+    fun getBlockingBid(biddingPower: Int, cells: String): Int? {
+        val opponentBiddingPower = 200 - biddingPower
+        for (winPosition in WIN_POSITIONS) {
+            val sum = winPosition.map { position ->
+                when (cells[position]) {
+                    PLAYER_ONE_PIECE -> 1
+                    PLAYER_TWO_PIECE -> -1
+                    else -> {
+                        0
+                    }
+                }
+            }.sum()
+
+            if ((isPlayerOne && sum == -2) || (!isPlayerOne && sum == 2)) {
+                return Math.min(opponentBiddingPower + 1, biddingPower)
+            }
+        }
+        return null
+    }
+
+    fun getWinningMoveIndex(cells: String): Int? {
+        for (winPosition in WIN_POSITIONS) {
+            val sum = winPosition.map { position ->
+                when (cells[position]) {
+                    PLAYER_ONE_PIECE -> 1
+                    PLAYER_TWO_PIECE -> -1
+                    else -> {
+                        0
+                    }
+                }
+            }.sum()
+            if (isPlayerOne && sum == 2 || !isPlayerOne && sum == -2)
+                return winPosition.first { position -> cells[position] == EMPTY_SPACE } // Return winning position
+        }
+        return null
+    }
+
+    fun getBlockingMoveIndex(cells: String): Int? {
+        for (winPosition in WIN_POSITIONS) {
+            val sum = winPosition.map { position ->
+                when (cells[position]) {
+                    PLAYER_ONE_PIECE -> 1
+                    PLAYER_TWO_PIECE -> -1
+                    else -> {
+                        0
+                    }
+                }
+            }.sum()
+            if (isPlayerOne && sum == -2 || !isPlayerOne && sum == 2)
+                return winPosition.first { position -> cells[position] == EMPTY_SPACE } // Return blocking position
+        }
+        return null
+    }
+
+    fun getMiddleIndex(cells: String): Int? {
+        return if (cells[4] == EMPTY_SPACE)
+            4
+        else null
+    }
+
+    fun getConsecutiveMoveIndex(cells: String): Int? {
+        for (winPosition in WIN_POSITIONS) {
+            val winPositionCells = winPosition.map { position ->
+                cells[position]
+            }
+            val numSpaces = winPositionCells.map { winPositionCell ->
+                when (winPositionCell) {
+                    PLAYER_ONE_PIECE -> 0
+                    PLAYER_TWO_PIECE -> 0
+                    else -> {
+                        1
+                    }
+                }
+            }.sum()
+            if ((isPlayerOne && numSpaces == 2 && winPositionCells.contains(PLAYER_ONE_PIECE)) ||
+                    (!isPlayerOne && numSpaces == 2 && winPositionCells.contains(PLAYER_TWO_PIECE)))
+                return winPosition.first { position -> cells[position] == EMPTY_SPACE }
+        }
+        return null
+    }
 }

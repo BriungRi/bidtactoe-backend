@@ -10,15 +10,18 @@ private const val MOVE_KEY_PREFIX = "q:move"
 
 private const val LEARNING_RATE = 0.1
 private const val DISCOUNT_FACTOR = 0.1
-private const val PROBABILITY_EXPLORE = 0.10
+private const val PROBABILITY_EXPLORE = 0.05
 private const val REWARD = 1.0
-private const val TIE_REWARD = 0.2
+private const val TIE_REWARD = 0.0
 
 class QLearningPlayer(private val aiRepository: AIRepository,
                       private val bidActionKeys: MutableList<String>,
                       private val moveActionKeys: MutableList<String>) : AIPlayer() {
 
     override fun getBidAmt(biddingPower: Int, cells: String): Int {
+        getWinningBid(biddingPower, cells)?.let { return it }
+        getBlockingBid(biddingPower, cells)?.let { return it }
+
         val bestBidAmt = aiRepository.getBestBidAmtByQValue(biddingPower, cells).first
         return if (shouldExplore()) {
             val randomBidAmt = (Math.random() * (biddingPower)).roundToInt()
@@ -31,6 +34,11 @@ class QLearningPlayer(private val aiRepository: AIRepository,
     }
 
     override fun getMoveIndex(biddingPower: Int, cells: String): Int {
+        getWinningMoveIndex(cells)?.let { return it }
+        getBlockingMoveIndex(cells)?.let { return it }
+        getConsecutiveMoveIndex(cells)?.let { return it }
+        getMiddleIndex(cells)?.let { return it }
+
         val openPositions = getOpenPositions(cells)
         val bestOpenPosition = aiRepository.getBestOpenPositionByQValue(biddingPower, cells, openPositions, isPlayerOne).first
         return if (shouldExplore()) {
