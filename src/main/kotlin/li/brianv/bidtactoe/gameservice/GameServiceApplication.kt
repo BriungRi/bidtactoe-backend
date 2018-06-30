@@ -2,7 +2,6 @@ package li.brianv.bidtactoe.gameservice
 
 import li.brianv.bidtactoe.gameservice.firebase.GameFCMComponent
 import li.brianv.bidtactoe.gameservice.game.GameManager
-import li.brianv.bidtactoe.gameservice.game.player.Player
 import li.brianv.bidtactoe.gameservice.mongo.MongoConnectionService
 import li.brianv.bidtactoe.gameservice.repository.AIDataMongoRepository
 import li.brianv.bidtactoe.gameservice.repository.AIRepository
@@ -21,7 +20,7 @@ import java.util.*
 class GameServiceApplication {
     @Bean
     fun provideGameManager(gameFCMComponent: GameFCMComponent, gameWSComponent: GameWSComponent, aiRepository: AIRepository): GameManager {
-        return GameManager(LinkedList<Player>(), ArrayList(), gameFCMComponent, gameWSComponent, aiRepository)
+        return GameManager(LinkedList(), ArrayList(), HashMap(), gameFCMComponent, gameWSComponent, aiRepository)
     }
 
     @Bean

@@ -14,27 +14,28 @@ class GameManagerTest {
 
     private val playerQueue = LinkedList<Player>()
     private val gameArray = ArrayList<Game>()
+    private val matchQueueMap = HashMap<String, Player>()
     private val gameFCMComponent = mock(GameFCMComponent::class.java)
     private val gameWSComponent = mock(GameWSComponent::class.java)
     private val aiRepository = mock(AIRepository::class.java)
-    private val gameManager = GameManager(playerQueue, gameArray, gameFCMComponent, gameWSComponent, aiRepository)
+    private val gameManager = GameManager(playerQueue, gameArray, matchQueueMap, gameFCMComponent, gameWSComponent, aiRepository)
 
     @Test
     fun joinGame_oneWebJoin() {
-        gameManager.joinGame("", "web", "")
+        gameManager.joinRandomGame("", "web", "")
         assert(playerQueue[0] is WebPlayer)
     }
 
     @Test
     fun joinGame_oneAndroidJoin() {
-        gameManager.joinGame("", "android", "")
+        gameManager.joinRandomGame("", "android", "")
         assert(playerQueue[0] is AndroidPlayer)
     }
 
     @Test
     fun joinGame_twoJoin() {
-        gameManager.joinGame("", "android", "")
-        gameManager.joinGame("", "web", "")
+        gameManager.joinRandomGame("", "android", "")
+        gameManager.joinRandomGame("", "web", "")
         Thread.sleep(1000)
         assert(playerQueue.isEmpty())
         assert(!gameArray.isEmpty())
@@ -43,7 +44,7 @@ class GameManagerTest {
     @Test
     fun leaveQueue() {
         val fakeUsername = "fake username"
-        gameManager.joinGame(fakeUsername, "web", "")
+        gameManager.joinRandomGame(fakeUsername, "web", "")
         gameManager.leaveQueue(fakeUsername)
         assert(playerQueue.isEmpty())
     }

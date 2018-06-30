@@ -2,6 +2,7 @@ package li.brianv.bidtactoe.gameservice
 
 import li.brianv.bidtactoe.gameservice.exceptions.BadLoginException
 import li.brianv.bidtactoe.gameservice.game.GameManager
+import li.brianv.bidtactoe.gameservice.model.GameCode
 import li.brianv.bidtactoe.gameservice.model.user.User
 import li.brianv.bidtactoe.gameservice.repository.UserRepository
 import org.slf4j.Logger
@@ -16,10 +17,26 @@ class GameRestController(val gameManager: GameManager, val userRepository: UserR
     val logger: Logger = LoggerFactory.getLogger(GameRestController::class.java.simpleName)
 
     @RequestMapping(method = [(RequestMethod.POST)],
+            value = ["/create_game"],
+            consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
+    @ResponseBody
+    fun createGame(username: String, deviceType: String, deviceToken: String): GameCode {
+        return gameManager.createGame(username, deviceType, deviceToken)
+    }
+
+    @RequestMapping(method = [(RequestMethod.POST)],
             value = ["/join_game"],
             consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
-    fun joinGame(username: String, deviceType: String, deviceToken: String) {
-        gameManager.joinGame(username, deviceType, deviceToken)
+    @ResponseBody
+    fun joinGame(username: String, deviceType: String, deviceToken: String, gameCode: String) {
+        gameManager.joinGame(username, deviceType, deviceToken, gameCode)
+    }
+
+    @RequestMapping(method = [(RequestMethod.POST)],
+            value = ["/join_random_game"],
+            consumes = [(MediaType.APPLICATION_FORM_URLENCODED_VALUE)])
+    fun joinRandomGame(username: String, deviceType: String, deviceToken: String) {
+        gameManager.joinRandomGame(username, deviceType, deviceToken)
     }
 
     @RequestMapping(method = [(RequestMethod.POST)],

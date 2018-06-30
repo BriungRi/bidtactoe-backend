@@ -1,5 +1,6 @@
 package li.brianv.bidtactoe.gameservice.game
 
+import li.brianv.bidtactoe.gameservice.exceptions.BadGameCodeException
 import li.brianv.bidtactoe.gameservice.firebase.GameFCMComponent
 import li.brianv.bidtactoe.gameservice.game.player.AndroidPlayer
 import li.brianv.bidtactoe.gameservice.game.player.Player
@@ -7,10 +8,12 @@ import li.brianv.bidtactoe.gameservice.game.player.WebPlayer
 import li.brianv.bidtactoe.gameservice.game.player.ai.QLearningPlayer
 import li.brianv.bidtactoe.gameservice.game.player.ai.SmartNormalDistPlayer
 import li.brianv.bidtactoe.gameservice.model.DeviceType
+import li.brianv.bidtactoe.gameservice.model.GameCode
 import li.brianv.bidtactoe.gameservice.repository.AIRepository
 import li.brianv.bidtactoe.gameservice.websockets.GameWSComponent
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.math.BigInteger
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -18,13 +21,44 @@ val logger: Logger = LoggerFactory.getLogger(GameManager::class.java.simpleName)
 
 class GameManager(private val playerQueue: Queue<Player>,
                   private val gameArray: ArrayList<Game>,
+                  private val matchQueueMap: MutableMap<String, Player>,
                   private val gameFCMComponent: GameFCMComponent,
                   private val gameWSComponent: GameWSComponent,
                   private val aiRepository: AIRepository) {
 
     private var numPlayers = 0
+    private var gameIndex = BigInteger.ONE
 
-    fun joinGame(username: String, deviceType: String, deviceToken: String) { // TODO: Synchronize this method?
+    fun createGame(username: String, deviceType: String, deviceToken: String): GameCode {
+        val gameCode = gameIndex.toString()
+        when (deviceType) {
+            DeviceType.ANDROID.stringName ->
+                matchQueueMap[gameCode] = AndroidPlayer(username, gameFCMComponent, deviceToken)
+            DeviceType.WEB.stringName ->
+                matchQueueMap[gameCode] = WebPlayer(username, gameWSComponent)
+        }
+        gameIndex = gameIndex.add(BigInteger.ONE)
+        return GameCode(gameCode)
+    }
+
+    fun joinGame(username: String, deviceType: String, deviceToken: String, gameCode: String) {
+        if (matchQueueMap.containsKey(gameCode)) {
+            matchQueueMap[gameCode]?.let { otherPlayer ->
+                val player = when (deviceType) {
+                    DeviceType.ANDROID.stringName ->
+                        AndroidPlayer(username, gameFCMComponent, deviceToken)
+                    DeviceType.WEB.stringName ->
+                        WebPlayer(username, gameWSComponent)
+                    else ->
+                        WebPlayer(username, gameWSComponent)
+                }
+                createNewGame(player, otherPlayer)
+            }
+        } else
+            throw BadGameCodeException()
+    }
+
+    fun joinRandomGame(username: String, deviceType: String, deviceToken: String) { // TODO: Synchronize this method?
         when (deviceType) {
             DeviceType.ANDROID.stringName -> playerQueue.add(AndroidPlayer(username, gameFCMComponent, deviceToken))
             DeviceType.WEB.stringName -> playerQueue.add(WebPlayer(username, gameWSComponent))
@@ -48,13 +82,13 @@ class GameManager(private val playerQueue: Queue<Player>,
     private fun checkIfGameCanBeCreated() {
         numPlayers++
         if (playerQueue.size >= 2) {
-            createNewGame()
+            createNewGame(playerQueue.poll(), playerQueue.poll())
         }
     }
 
-    private fun createNewGame() {
+    private fun createNewGame(playerOne: Player, playerTwo: Player) {
         thread {
-            val game = Game(playerQueue.poll(), playerQueue.poll())
+            val game = Game(playerOne, playerTwo)
             val nextGameIndex = getNextGameIndex()
             if (nextGameIndex < gameArray.size)
                 gameArray[nextGameIndex] = game
