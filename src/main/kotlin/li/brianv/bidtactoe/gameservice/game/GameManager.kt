@@ -29,6 +29,7 @@ class GameManager(private val playerQueue: Queue<Player>,
     private var numPlayers = 0
     private var gameIndex = BigInteger.ONE
 
+    @Synchronized
     fun createGame(username: String, deviceType: String, deviceToken: String): GameCode {
         val gameCode = gameIndex.toString()
         when (deviceType) {
@@ -41,6 +42,7 @@ class GameManager(private val playerQueue: Queue<Player>,
         return GameCode(gameCode)
     }
 
+    @Synchronized
     fun joinGame(username: String, deviceType: String, deviceToken: String, gameCode: String) {
         if (matchQueueMap.containsKey(gameCode)) {
             matchQueueMap[gameCode]?.let { otherPlayer ->
@@ -58,7 +60,8 @@ class GameManager(private val playerQueue: Queue<Player>,
             throw BadGameCodeException()
     }
 
-    fun joinRandomGame(username: String, deviceType: String, deviceToken: String) { // TODO: Synchronize this method?
+    @Synchronized
+    fun joinRandomGame(username: String, deviceType: String, deviceToken: String) {
         when (deviceType) {
             DeviceType.ANDROID.stringName -> playerQueue.add(AndroidPlayer(username, gameFCMComponent, deviceToken))
             DeviceType.WEB.stringName -> playerQueue.add(WebPlayer(username, gameWSComponent))
@@ -66,6 +69,7 @@ class GameManager(private val playerQueue: Queue<Player>,
         checkIfGameCanBeCreated()
     }
 
+    @Synchronized
     fun addAI() {
         playerQueue.add(
                 if (numPlayers % 2 == 0)
