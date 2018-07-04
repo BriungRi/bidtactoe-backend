@@ -101,4 +101,29 @@ class AIDataRedisRepository(private val redisConnectionService: RedisConnectionS
         }
         return numGames
     }
+
+    override fun incrNumEvalWins() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun incrNumEvalTies() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun incrNumEvalLosses() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getNumEvalWins(): Int {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getNumEvalTies(): Int {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getNumEvalLosses(): Int {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
 }

@@ -17,4 +17,17 @@ interface AIRepository {
     fun getNumWins(): Int
 
     fun getNumGames(): Int
+
+    fun incrNumEvalWins()
+
+    fun incrNumEvalTies()
+
+    fun incrNumEvalLosses()
+
+    fun getNumEvalWins(): Int
+
+    fun getNumEvalTies(): Int
+
+    fun getNumEvalLosses(): Int
+
 }

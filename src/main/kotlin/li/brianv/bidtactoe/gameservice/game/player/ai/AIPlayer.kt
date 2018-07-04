@@ -9,7 +9,7 @@ import kotlin.concurrent.thread
 
 abstract class AIPlayer : Player() {
 
-    override val username = ("Guest-" + UUID.randomUUID().toString()).substring(0..13)
+    override val username = ("Guest-" + getAICode() + UUID.randomUUID().toString()).substring(0..13)
     private var gameIndex = -1
     protected var isPlayerOne = false
     private var biddingPower = 100
@@ -66,6 +66,8 @@ abstract class AIPlayer : Player() {
     abstract fun getBidAmt(biddingPower: Int, cells: String): Int
 
     abstract fun getMoveIndex(biddingPower: Int, cells: String): Int
+
+    abstract fun getAICode(): String
 
     fun getWinningBid(biddingPower: Int, cells: String): Int? {
         for (winPosition in WIN_POSITIONS) {
@@ -144,6 +146,16 @@ abstract class AIPlayer : Player() {
         return if (cells[4] == EMPTY_SPACE)
             4
         else null
+    }
+
+    fun getCornerIndex(cells: String): Int? {
+        return when (EMPTY_SPACE) {
+            cells[0] -> 0
+            cells[2] -> 2
+            cells[6] -> 6
+            cells[8] -> 8
+            else -> null
+        }
     }
 
     fun getConsecutiveMoveIndex(cells: String): Int? {

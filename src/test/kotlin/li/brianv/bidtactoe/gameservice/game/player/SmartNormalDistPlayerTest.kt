@@ -120,4 +120,18 @@ class SmartNormalDistPlayerTest {
             assert(moveIndex == 4)
         }
     }
+
+    @Test
+    fun getMoveIndex_corners() {
+        val biddingPower = 150
+        val cases = arrayOf(
+                "   " +
+                        " O " +
+                        "   ")
+        val expected = arrayOf(0)
+        for (case in cases.zip(expected)) {
+            val moveIndex = smartNormalDistPlayer.getMoveIndex(biddingPower, case.first)
+            assert(moveIndex == case.second)
+        }
+    }
 }

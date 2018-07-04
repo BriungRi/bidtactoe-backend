@@ -3,7 +3,9 @@ package li.brianv.bidtactoe.gameservice
 import li.brianv.bidtactoe.gameservice.exceptions.BadLoginException
 import li.brianv.bidtactoe.gameservice.game.GameManager
 import li.brianv.bidtactoe.gameservice.model.GameCode
+import li.brianv.bidtactoe.gameservice.model.Number
 import li.brianv.bidtactoe.gameservice.model.user.User
+import li.brianv.bidtactoe.gameservice.repository.AIRepository
 import li.brianv.bidtactoe.gameservice.repository.UserRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -12,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 
 @CrossOrigin(origins = ["http://localhost:3000", "http://tactoe.bid", "http://localhost:3001"])
 @RestController
-class GameRestController(val gameManager: GameManager, val userRepository: UserRepository) {
+class GameRestController(val gameManager: GameManager, val userRepository: UserRepository, val aiRepository: AIRepository) {
 
     val logger: Logger = LoggerFactory.getLogger(GameRestController::class.java.simpleName)
 
@@ -87,4 +89,18 @@ class GameRestController(val gameManager: GameManager, val userRepository: UserR
         userRepository.createUser(username, email, password)
     }
 
+    @GetMapping(value = ["/num_ai_wins"])
+    fun getNumAIWins(): Number {
+        return Number(aiRepository.getNumEvalWins())
+    }
+
+    @GetMapping(value = ["/num_ai_ties"])
+    fun getNumAITies(): Number {
+        return Number(aiRepository.getNumEvalTies())
+    }
+
+    @RequestMapping(value = ["/num_ai_losses"])
+    fun getNumAIGames(): Number {
+        return Number(aiRepository.getNumEvalLosses())
+    }
 }

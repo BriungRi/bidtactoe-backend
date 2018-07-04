@@ -23,22 +23,23 @@ class GameManagerTest {
     @Test
     fun joinGame_oneWebJoin() {
         gameManager.joinRandomGame("", "web", "")
-        assert(playerQueue[0] is WebPlayer)
+        Thread.sleep(500)
+        assert(gameArray.size == 1)
     }
 
     @Test
     fun joinGame_oneAndroidJoin() {
         gameManager.joinRandomGame("", "android", "")
-        assert(playerQueue[0] is AndroidPlayer)
+        Thread.sleep(500)
+        assert(gameArray.size == 1)
     }
 
     @Test
     fun joinGame_twoJoin() {
         gameManager.joinRandomGame("", "android", "")
         gameManager.joinRandomGame("", "web", "")
-        Thread.sleep(1000)
-        assert(playerQueue.isEmpty())
-        assert(!gameArray.isEmpty())
+        Thread.sleep(500)
+        assert(gameArray.size == 2)
     }
 
     @Test

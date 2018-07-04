@@ -13,7 +13,7 @@ class QLearningPlayerTest {
         on { getBestBidAmtByQValue(any(), any()) } doReturn Pair(0, 0.0)
         on { getBestOpenPositionByQValue(any(), any(), any(), any()) } doReturn Pair(4, 0.0)
     }
-    private val qLearningPlayer = QLearningPlayer(aiRepository, mock(), mock())
+    private val qLearningPlayer = QLearningPlayer(aiRepository, mock(), mock(), true)
 
     /* Correctness tests
        it is assumed that !isPlayerOne
@@ -126,6 +126,20 @@ class QLearningPlayerTest {
         for (i in 0..100) {
             val moveIndex = qLearningPlayer.getMoveIndex(5, "OOOO OOOO")
             assert(moveIndex == 4)
+        }
+    }
+
+    @Test
+    fun getMoveIndex_corners() {
+        val biddingPower = 150
+        val cases = arrayOf(
+                "   " +
+                " O " +
+                "   ")
+        val expected = arrayOf(0)
+        for (case in cases.zip(expected)) {
+            val moveIndex = qLearningPlayer.getMoveIndex(biddingPower, case.first)
+            assert(moveIndex == case.second)
         }
     }
 

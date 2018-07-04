@@ -5,6 +5,9 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 open class NormalDistPlayer : AIPlayer() {
+    override fun getAICode(): String {
+        return "NDP"
+    }
 
     private val random = Random()
 

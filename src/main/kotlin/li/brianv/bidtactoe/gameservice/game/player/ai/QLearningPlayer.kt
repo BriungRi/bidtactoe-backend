@@ -16,7 +16,11 @@ private const val TIE_REWARD = 0.0
 
 class QLearningPlayer(private val aiRepository: AIRepository,
                       private val bidActionKeys: MutableList<String>,
-                      private val moveActionKeys: MutableList<String>) : AIPlayer() {
+                      private val moveActionKeys: MutableList<String>,
+                      private val training: Boolean) : AIPlayer() {
+    override fun getAICode(): String {
+        return "QLP"
+    }
 
     override fun getBidAmt(biddingPower: Int, cells: String): Int {
         getWinningBid(biddingPower, cells)?.let { return it }
@@ -38,6 +42,7 @@ class QLearningPlayer(private val aiRepository: AIRepository,
         getBlockingMoveIndex(cells)?.let { return it }
         getConsecutiveMoveIndex(cells)?.let { return it }
         getMiddleIndex(cells)?.let { return it }
+        getCornerIndex(cells)?.let { return it }
 
         val openPositions = getOpenPositions(cells)
         val bestOpenPosition = aiRepository.getBestOpenPositionByQValue(biddingPower, cells, openPositions, isPlayerOne).first
@@ -52,7 +57,7 @@ class QLearningPlayer(private val aiRepository: AIRepository,
     }
 
     private fun shouldExplore(): Boolean {
-        return Math.random() < PROBABILITY_EXPLORE
+        return training && Math.random() < PROBABILITY_EXPLORE
     }
 
     private fun getOpenPositions(cells: String): List<Int> {
@@ -65,14 +70,21 @@ class QLearningPlayer(private val aiRepository: AIRepository,
     }
 
     override fun onGameOver(winnerUsername: String) {
-        super.onGameOver(winnerUsername)
         val didWin = this.username == winnerUsername
         val didTie = winnerUsername == NO_WINNER_USERNAME
-        aiRepository.incrNumGames()
-        updateBidQValues(didWin, didTie)
-        updateMoveQValues(didWin, didTie)
-        if (didWin)
-            aiRepository.incrNumWins()
+        if (training) {
+            aiRepository.incrNumGames()
+            updateBidQValues(didWin, didTie)
+            updateMoveQValues(didWin, didTie)
+            if (didWin)
+                aiRepository.incrNumWins()
+        } else {
+            when {
+                didWin -> aiRepository.incrNumEvalWins()
+                didTie -> aiRepository.incrNumEvalTies()
+                else -> aiRepository.incrNumEvalLosses()
+            }
+        }
     }
 
     private fun updateBidQValues(didWin: Boolean, didTie: Boolean) {

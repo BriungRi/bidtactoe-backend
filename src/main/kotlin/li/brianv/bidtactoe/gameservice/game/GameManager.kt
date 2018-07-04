@@ -1,5 +1,6 @@
 package li.brianv.bidtactoe.gameservice.game
 
+import li.brianv.bidtactoe.gameservice.exceptions.BadDeviceTypeException
 import li.brianv.bidtactoe.gameservice.exceptions.BadGameCodeException
 import li.brianv.bidtactoe.gameservice.firebase.GameFCMComponent
 import li.brianv.bidtactoe.gameservice.game.player.AndroidPlayer
@@ -15,6 +16,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.math.BigInteger
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.concurrent.thread
 
 val logger: Logger = LoggerFactory.getLogger(GameManager::class.java.simpleName)
@@ -26,7 +28,7 @@ class GameManager(private val playerQueue: Queue<Player>,
                   private val gameWSComponent: GameWSComponent,
                   private val aiRepository: AIRepository) {
 
-    private var numPlayers = 0
+    private var numAIGames = 0
     private var gameIndex = BigInteger.ONE
 
     @Synchronized
@@ -62,33 +64,27 @@ class GameManager(private val playerQueue: Queue<Player>,
 
     @Synchronized
     fun joinRandomGame(username: String, deviceType: String, deviceToken: String) {
-        when (deviceType) {
-            DeviceType.ANDROID.stringName -> playerQueue.add(AndroidPlayer(username, gameFCMComponent, deviceToken))
-            DeviceType.WEB.stringName -> playerQueue.add(WebPlayer(username, gameWSComponent))
+        val player = when (deviceType) {
+            DeviceType.ANDROID.stringName -> AndroidPlayer(username, gameFCMComponent, deviceToken)
+            DeviceType.WEB.stringName -> WebPlayer(username, gameWSComponent)
+            else -> throw BadDeviceTypeException()
         }
-        checkIfGameCanBeCreated()
+        createNewGame(player, QLearningPlayer(aiRepository, ArrayList(), ArrayList(), training = false))
     }
 
     @Synchronized
     fun addAI() {
-        playerQueue.add(
-                if (numPlayers % 2 == 0)
-                    QLearningPlayer(aiRepository, ArrayList(), ArrayList())
-                else
-                    SmartNormalDistPlayer()
-        )
-        checkIfGameCanBeCreated()
-
-        if (numPlayers % 1200 == 0) // Output every 10 minutes. 60 games a minute, 600 games every 10 minutes, 1200 players every 10 minutes
+        createNewGame(QLearningPlayer(aiRepository, ArrayList(), ArrayList(), training = true), SmartNormalDistPlayer())
+        numAIGames++
+        if (numAIGames % 1200 == 0)
             outputAIPerformance()
     }
 
-    private fun checkIfGameCanBeCreated() {
-        numPlayers++
-        if (playerQueue.size >= 2) {
-            createNewGame(playerQueue.poll(), playerQueue.poll())
-        }
-    }
+//    private fun checkIfGameCanBeCreated() {
+//        if (playerQueue.size >= 2) {
+//            createNewGame(playerQueue.poll(), playerQueue.poll())
+//        }
+//    }
 
     private fun createNewGame(playerOne: Player, playerTwo: Player) {
         thread {
@@ -115,7 +111,6 @@ class GameManager(private val playerQueue: Queue<Player>,
         val numGames = aiRepository.getNumGames().toDouble()
         val numWins = aiRepository.getNumWins().toDouble()
         val winRate = (numWins / numGames) * 100
-        logger.info("Total games,Total wins,Win rate")
         logger.info("$numGames,$numWins,$winRate")
     }
 

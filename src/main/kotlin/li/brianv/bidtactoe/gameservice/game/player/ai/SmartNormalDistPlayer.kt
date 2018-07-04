@@ -2,6 +2,10 @@ package li.brianv.bidtactoe.gameservice.game.player.ai
 
 open class SmartNormalDistPlayer : NormalDistPlayer() {
 
+    override fun getAICode(): String {
+        return "SNDP"
+    }
+
     /**
      * If the other player's about to win, outbid them to block
      * Else, if player is about to win, bid all
@@ -24,6 +28,7 @@ open class SmartNormalDistPlayer : NormalDistPlayer() {
         getBlockingMoveIndex(cells)?.let { return it }
         getConsecutiveMoveIndex(cells)?.let { return it }
         getMiddleIndex(cells)?.let { return it }
+        getCornerIndex(cells)?.let { return it }
         return super.getMoveIndex(biddingPower, cells)
     }
 
