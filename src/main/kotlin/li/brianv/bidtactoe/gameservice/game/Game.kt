@@ -5,7 +5,6 @@ import li.brianv.bidtactoe.gameservice.exceptions.PlayerGameMismatchException
 import li.brianv.bidtactoe.gameservice.game.player.Player
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import kotlin.concurrent.thread
 
 const val NO_WINNER_USERNAME = "no_winner"
 const val EMPTY_SPACE = ' '
@@ -29,18 +28,25 @@ class Game(private val playerOne: Player,
     private var cells: String = "         "
     var gameIsOver = false
         private set
+    private var numBidTies = 0
+    private var playerOneMadeBid = false
+    private var playerTwoMadeBid = false
 
+    @Synchronized
     fun sendGameReadyUpdate(gameIndex: Int) {
         playerOne.onGameReady(gameIndex, playerOne.username, playerTwo.username)
         playerTwo.onGameReady(gameIndex, playerOne.username, playerTwo.username)
     }
 
+    @Synchronized
     fun bid(username: String, bidAmt: Int) {
         when (username) {
             playerOne.username -> {
+                playerOneMadeBid = true
                 handleBid(playerOne, bidAmt)
             }
             playerTwo.username -> {
+                playerTwoMadeBid = true
                 handleBid(playerTwo, bidAmt)
             }
             else -> throw PlayerGameMismatchException()
@@ -52,27 +58,34 @@ class Game(private val playerOne: Player,
         if (gameOver()) {
             return
         } else if (bothPlayersMadeBids()) {
-            playerOne.resetBidParameters()
-            playerTwo.resetBidParameters()
+            playerOneMadeBid = false
+            playerTwoMadeBid = false
             when (getBidWinnerUsername()) {
                 playerOne.username -> {
+                    numBidTies = 0
                     playerOne.winnerBidUpdate()
                     playerTwo.loserBidUpdate(playerOne.username, playerOne.bidAmt)
                 }
                 playerTwo.username -> {
+                    numBidTies = 0
                     playerOne.loserBidUpdate(playerTwo.username, playerTwo.bidAmt)
                     playerTwo.winnerBidUpdate()
                 }
                 else -> {
-                    playerOne.tieBidUpdate()
-                    playerTwo.tieBidUpdate()
+                    numBidTies++
+                    if (numBidTies < 3) {
+                        playerOne.tieBidUpdate()
+                        playerTwo.tieBidUpdate()
+                    } else {
+                        setGameOver(NO_WINNER_USERNAME)
+                    }
                 }
             }
         }
     }
 
     private fun bothPlayersMadeBids(): Boolean {
-        return playerOne.madeBid && playerTwo.madeBid
+        return playerOneMadeBid && playerTwoMadeBid
     }
 
     private fun getBidWinnerUsername(): String {
@@ -83,6 +96,7 @@ class Game(private val playerOne: Player,
         }
     }
 
+    @Synchronized
     fun move(newCells: String) {
         if (validMove(cells, newCells)) {
             this.cells = newCells
@@ -90,14 +104,18 @@ class Game(private val playerOne: Player,
             playerTwo.onMoveCompleted(cells)
             if (gameOver()) {
                 val gameWinnerUsername = getGameWinnerUsername()
-                playerOne.onGameOver(gameWinnerUsername)
-                playerTwo.onGameOver(gameWinnerUsername)
-                gameIsOver = true
+                setGameOver(gameWinnerUsername)
             }
 
         } else {
             throw IllegalMoveException()
         }
+    }
+
+    private fun setGameOver(gameWinnerUsername: String) {
+        playerOne.onGameOver(gameWinnerUsername)
+        playerTwo.onGameOver(gameWinnerUsername)
+        gameIsOver = true
     }
 
     private fun validMove(oldCells: String, newCells: String): Boolean {

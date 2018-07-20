@@ -1,11 +1,13 @@
-package li.brianv.bidtactoe.gameservice.game.player
+package li.brianv.bidtactoe.gameservice.game.player.ai
 
 import li.brianv.bidtactoe.gameservice.game.EMPTY_SPACE
-import li.brianv.bidtactoe.gameservice.game.GameManager
 import java.util.*
 import kotlin.collections.ArrayList
 
-class NormalDistPlayer(gameManager: GameManager) : AIPlayer(gameManager) {
+open class NormalDistPlayer : AIPlayer() {
+    override fun getAICode(): String {
+        return "NDP"
+    }
 
     private val random = Random()
 
@@ -22,7 +24,7 @@ class NormalDistPlayer(gameManager: GameManager) : AIPlayer(gameManager) {
     /**
      * Finds random spot to place the piece
      */
-    override fun getMoveIndex(biddingPower: Int, cells: String, isPlayerOne: Boolean): Int {
+    override fun getMoveIndex(biddingPower: Int, cells: String): Int {
         val openPositions = ArrayList<Int>()
         for (i in 0 until cells.length) {
             if (cells[i] == EMPTY_SPACE)

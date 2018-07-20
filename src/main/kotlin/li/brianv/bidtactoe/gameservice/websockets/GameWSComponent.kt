@@ -16,31 +16,23 @@ class GameWSComponent(val messagingTemplate: SimpMessageSendingOperations) {
     fun gameReadyUpdate(gameIndex: Int, playerOneUsername: String, playerTwoUsername: String, username: String) {
         thread(start = true) {
             Thread.sleep(1000)
-            logger.info("gameReadyUpdate() " +
-                    "gameIndex: $gameIndex, " +
-                    "playerOneUsername: $playerOneUsername, " +
-                    "playerTwoUsername: $playerTwoUsername, " +
-                    "username: $username")
             messagingTemplate.convertAndSend("/topic/public/$username",
                     GameReadyMessage(gameIndex, playerOneUsername, playerTwoUsername))
         }.run()
     }
 
     fun bidsCompletedUpdate(bidWinnerId: String, biddingPower: Int, username: String) {
-        logger.info("bidsCompletedUpdate() bidWinnerId: $bidWinnerId, biddingPower: $biddingPower")
         messagingTemplate.convertAndSend("/topic/public/$username",
                 BidsReadyMessage(bidWinnerId, biddingPower))
     }
 
     fun moveUpdate(cells: String, vararg usernames: String) {
-        logger.info("moveUpdate() cells: $cells")
         for (username in usernames) {
             messagingTemplate.convertAndSend("/topic/public/$username", MoveUpdateMessage(cells))
         }
     }
 
     fun victoryUpdate(winnerId: String, vararg usernames: String) {
-        logger.info("victoryUpdate() winnerId: $winnerId")
         for (username in usernames) {
             messagingTemplate.convertAndSend("/topic/public/$username", WinnerUpdateMessage(winnerId))
         }

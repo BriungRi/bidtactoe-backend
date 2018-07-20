@@ -2,7 +2,9 @@ package li.brianv.bidtactoe.gameservice
 
 import li.brianv.bidtactoe.gameservice.firebase.GameFCMComponent
 import li.brianv.bidtactoe.gameservice.game.GameManager
-import li.brianv.bidtactoe.gameservice.game.player.Player
+import li.brianv.bidtactoe.gameservice.mongo.MongoConnectionService
+import li.brianv.bidtactoe.gameservice.repository.AIDataMongoRepository
+import li.brianv.bidtactoe.gameservice.repository.AIRepository
 import li.brianv.bidtactoe.gameservice.websockets.GameWSComponent
 import org.riversun.fcm.FcmClient
 import org.springframework.boot.SpringApplication
@@ -17,8 +19,13 @@ import java.util.*
 @EnableAutoConfiguration(exclude = [(MongoAutoConfiguration::class)])
 class GameServiceApplication {
     @Bean
-    fun provideGameManager(gameFCMComponent: GameFCMComponent, gameWSComponent: GameWSComponent): GameManager {
-        return GameManager(LinkedList<Player>(), ArrayList(), gameFCMComponent, gameWSComponent)
+    fun provideGameManager(gameFCMComponent: GameFCMComponent, gameWSComponent: GameWSComponent, aiRepository: AIRepository): GameManager {
+        return GameManager(LinkedList(), ArrayList(), HashMap(), gameFCMComponent, gameWSComponent, aiRepository)
+    }
+
+    @Bean
+    fun provideAIRepository(mongoConnectionService: MongoConnectionService): AIRepository {
+        return AIDataMongoRepository(mongoConnectionService)
     }
 
     @Bean
@@ -28,7 +35,7 @@ class GameServiceApplication {
         return client
     }
 
-    @Bean(name = ["mongoTaskScheduler"])
+    @Bean(name = ["driverTaskScheduler"])
     fun provideTaskScheduler(): ConcurrentTaskScheduler {
         return ConcurrentTaskScheduler()
     }

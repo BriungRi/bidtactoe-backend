@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        kotlinVersion = '1.2.10'
+        kotlinVersion = '1.2.41'
         springBootVersion = '1.5.13.RELEASE'
     }
     repositories {
@@ -49,6 +49,9 @@ dependencies {
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile "com.nhaarman:mockito-kotlin:1.5.0"
 
+    // https://mvnrepository.com/artifact/org.mindrot/jbcrypt
+    compile group: 'org.mindrot', name: 'jbcrypt', version: '0.3m'
+
     // https://mvnrepository.com/artifact/io.reactivex/rxkotlin
     compile group: 'io.reactivex', name: 'rxkotlin', version: '0.21.0'
 
@@ -56,7 +59,10 @@ dependencies {
     compile "org.riversun:fcm:0.2.0"
 
     // MongoDB Driver
-    compile 'org.mongodb:mongo-java-driver:3.6.1'
+    compile 'org.mongodb:mongo-java-driver:3.7.1'
+
+    // Redis Driver
+    compile group: 'redis.clients', name: 'jedis', version: '2.9.0'
 
     // Spring websockets
     compile("org.webjars:webjars-locator")

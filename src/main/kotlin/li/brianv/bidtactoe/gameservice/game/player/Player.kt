@@ -8,8 +8,6 @@ abstract class Player {
     abstract val username: String
 
     private var biddingPower = 100
-    var madeBid = false
-        private set
     var bidAmt = 0
         private set
 
@@ -24,7 +22,6 @@ abstract class Player {
     fun makeBid(bidAmt: Int) {
         if (bidAmt <= biddingPower) {
             this.bidAmt = bidAmt
-            madeBid = true
         } else {
             throw InsufficientBidPowerException()
         }
@@ -42,9 +39,5 @@ abstract class Player {
     fun loserBidUpdate(opponentUsername: String, opponentBid: Int) {
         biddingPower += opponentBid
         onBidsCompleted(opponentUsername, biddingPower)
-    }
-
-    fun resetBidParameters() {
-        madeBid = false
     }
 }
