@@ -6,11 +6,14 @@ import li.brianv.bidtactoe.gameservice.firebase.GameFCMComponent
 import li.brianv.bidtactoe.gameservice.game.player.AndroidPlayer
 import li.brianv.bidtactoe.gameservice.game.player.Player
 import li.brianv.bidtactoe.gameservice.game.player.WebPlayer
+import li.brianv.bidtactoe.gameservice.game.player.ai.NormalDistPlayer
 import li.brianv.bidtactoe.gameservice.game.player.ai.QLearningPlayer
+import li.brianv.bidtactoe.gameservice.game.player.ai.RandomPlayer
 import li.brianv.bidtactoe.gameservice.game.player.ai.SmartNormalDistPlayer
 import li.brianv.bidtactoe.gameservice.model.DeviceType
 import li.brianv.bidtactoe.gameservice.model.GameCode
-import li.brianv.bidtactoe.gameservice.repository.AIRepository
+import li.brianv.bidtactoe.gameservice.repository.AIDataMongoRepository
+import li.brianv.bidtactoe.gameservice.repository.FrozenAIDataMongoRepository
 import li.brianv.bidtactoe.gameservice.websockets.GameWSComponent
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -26,7 +29,8 @@ class GameManager(private val playerQueue: Queue<Player>,
                   private val matchQueueMap: MutableMap<String, Player>,
                   private val gameFCMComponent: GameFCMComponent,
                   private val gameWSComponent: GameWSComponent,
-                  private val aiRepository: AIRepository) {
+                  private val aiDataMongoRepository: AIDataMongoRepository,
+                  private val frozenAIDataMongoRepository: FrozenAIDataMongoRepository) {
 
     private var numAIGames = 0
     private var gameIndex = BigInteger.ONE
@@ -69,22 +73,24 @@ class GameManager(private val playerQueue: Queue<Player>,
             DeviceType.WEB.stringName -> WebPlayer(username, gameWSComponent)
             else -> throw BadDeviceTypeException()
         }
-        createNewGame(player, QLearningPlayer(aiRepository, ArrayList(), ArrayList(), training = false))
+        createNewGame(player, QLearningPlayer(aiDataMongoRepository, ArrayList(), ArrayList(), training = false))
     }
 
     @Synchronized
     fun addAI() {
-        createNewGame(QLearningPlayer(aiRepository, ArrayList(), ArrayList(), training = true), SmartNormalDistPlayer())
+        val roll = Math.random()
+        val opponentPlayer = when {
+            roll < 0.05 -> RandomPlayer()
+            roll < 0.15 -> NormalDistPlayer()
+            roll < 0.9 -> SmartNormalDistPlayer()
+            else -> QLearningPlayer(frozenAIDataMongoRepository, ArrayList(), ArrayList(), training = false)
+        }
+        createNewGame(QLearningPlayer(aiDataMongoRepository, ArrayList(), ArrayList(), training = true),
+                opponentPlayer)
         numAIGames++
-        if (numAIGames % 1200 == 0)
+        if (numAIGames % 1000 == 0)
             outputAIPerformance()
     }
-
-//    private fun checkIfGameCanBeCreated() {
-//        if (playerQueue.size >= 2) {
-//            createNewGame(playerQueue.poll(), playerQueue.poll())
-//        }
-//    }
 
     private fun createNewGame(playerOne: Player, playerTwo: Player) {
         thread {
@@ -108,8 +114,8 @@ class GameManager(private val playerQueue: Queue<Player>,
     }
 
     private fun outputAIPerformance() {
-        val numGames = aiRepository.getNumGames().toDouble()
-        val numWins = aiRepository.getNumWins().toDouble()
+        val numGames = aiDataMongoRepository.getNumGames().toDouble()
+        val numWins = aiDataMongoRepository.getNumWins().toDouble()
         val winRate = (numWins / numGames) * 100
         logger.info("$numGames,$numWins,$winRate")
     }

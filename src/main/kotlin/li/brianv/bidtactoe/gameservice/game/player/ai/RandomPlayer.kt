@@ -4,7 +4,7 @@ import li.brianv.bidtactoe.gameservice.game.EMPTY_SPACE
 import java.util.*
 import kotlin.collections.ArrayList
 
-open class NormalDistPlayer : AIPlayer() {
+open class RandomPlayer : AIPlayer() {
     override fun getAICode(): String {
         return "NDP"
     }
@@ -15,10 +15,7 @@ open class NormalDistPlayer : AIPlayer() {
      * Let the 3rd standard deviation give us the limit of the bidding range. If it ever exceeds, we can clamp the values at the min and max
      */
     override fun getBidAmt(biddingPower: Int, cells: String): Int {
-        val mean = 25
-        val std = 10
-        val opponentBiddingPower = 200 - biddingPower
-        return Math.min(Math.max(Math.min(((random.nextGaussian() * std) + mean).toInt(), biddingPower), 0), opponentBiddingPower + 1)
+        return (Math.random() * biddingPower).toInt()
     }
 
     /**

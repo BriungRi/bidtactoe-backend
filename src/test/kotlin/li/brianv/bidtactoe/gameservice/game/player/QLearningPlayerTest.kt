@@ -68,17 +68,30 @@ class QLearningPlayerTest {
         }
     }
 
-    @Test
-    fun getMoveIndex_playerHasOneDown() {
-        val biddingPower = 150
-        val cases = arrayOf("X        ", "   X     ", "      X  ")
-        val expected = arrayOf(1, 4, 7)
-        for (case in cases.zip(expected)) {
-            val moveIndex = qLearningPlayer.getMoveIndex(biddingPower, case.first)
-            assert(moveIndex == case.second)
-        }
-    }
+//    @Test
+//    fun getMoveIndex_playerHasOneDown() {
+//        val biddingPower = 150
+//        val cases = arrayOf("X        ", "   X     ", "      X  ")
+//        val expected = arrayOf(1, 4, 7)
+//        for (case in cases.zip(expected)) {
+//            val moveIndex = qLearningPlayer.getMoveIndex(biddingPower, case.first)
+//            assert(moveIndex == case.second)
+//        }
+//    }
 
+//    @Test
+//    fun getMoveIndex_corners() {
+//        val biddingPower = 150
+//        val cases = arrayOf(
+//                "   " +
+//                " O " +
+//                "   ")
+//        val expected = arrayOf(0)
+//        for (case in cases.zip(expected)) {
+//            val moveIndex = qLearningPlayer.getMoveIndex(biddingPower, case.first)
+//            assert(moveIndex == case.second)
+//        }
+//    }
     /* Validity tests */
 
     @Test
@@ -128,19 +141,4 @@ class QLearningPlayerTest {
             assert(moveIndex == 4)
         }
     }
-
-    @Test
-    fun getMoveIndex_corners() {
-        val biddingPower = 150
-        val cases = arrayOf(
-                "   " +
-                " O " +
-                "   ")
-        val expected = arrayOf(0)
-        for (case in cases.zip(expected)) {
-            val moveIndex = qLearningPlayer.getMoveIndex(biddingPower, case.first)
-            assert(moveIndex == case.second)
-        }
-    }
-
 }

@@ -2,11 +2,11 @@ package li.brianv.bidtactoe.gameservice
 
 import li.brianv.bidtactoe.gameservice.firebase.GameFCMComponent
 import li.brianv.bidtactoe.gameservice.game.GameManager
-import li.brianv.bidtactoe.gameservice.mongo.MongoConnectionService
 import li.brianv.bidtactoe.gameservice.repository.AIDataMongoRepository
-import li.brianv.bidtactoe.gameservice.repository.AIRepository
+import li.brianv.bidtactoe.gameservice.repository.FrozenAIDataMongoRepository
 import li.brianv.bidtactoe.gameservice.websockets.GameWSComponent
 import org.riversun.fcm.FcmClient
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -19,13 +19,12 @@ import java.util.*
 @EnableAutoConfiguration(exclude = [(MongoAutoConfiguration::class)])
 class GameServiceApplication {
     @Bean
-    fun provideGameManager(gameFCMComponent: GameFCMComponent, gameWSComponent: GameWSComponent, aiRepository: AIRepository): GameManager {
-        return GameManager(LinkedList(), ArrayList(), HashMap(), gameFCMComponent, gameWSComponent, aiRepository)
-    }
-
-    @Bean
-    fun provideAIRepository(mongoConnectionService: MongoConnectionService): AIRepository {
-        return AIDataMongoRepository(mongoConnectionService)
+    fun provideGameManager(gameFCMComponent: GameFCMComponent,
+                           gameWSComponent: GameWSComponent,
+                           @Qualifier("aiDataMongoRepository") aiDataMongoRepository: AIDataMongoRepository,
+                           @Qualifier("frozenAIDataMongoRepository") frozenAIDataMongoRepository: FrozenAIDataMongoRepository): GameManager {
+        return GameManager(LinkedList(), ArrayList(), HashMap(), gameFCMComponent, gameWSComponent,
+                aiDataMongoRepository, frozenAIDataMongoRepository)
     }
 
     @Bean

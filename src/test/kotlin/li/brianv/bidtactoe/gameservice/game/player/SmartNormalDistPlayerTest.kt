@@ -21,6 +21,17 @@ class SmartNormalDistPlayerTest {
     }
 
     @Test
+    fun getBidAmt_opponentWillWin2() {
+        val biddingPower = 200
+        val cases = arrayOf("OO       ", " OO      ", " O  O    ", "O   O    ")
+        for (case in cases) {
+            val bidAmt = smartNormalDistPlayer.getBidAmt(biddingPower, case)
+            assert(bidAmt == (200 - biddingPower) + 1)
+            assert(bidAmt == 1)
+        }
+    }
+
+    @Test
     fun getBidAmt_playerWillWin() {
         val biddingPower = 150
         val cases = arrayOf("XX       ", " XX      ", " X  X    ", "X   X    ")

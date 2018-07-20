@@ -1,10 +1,9 @@
 package li.brianv.bidtactoe.gameservice.game
 
 import li.brianv.bidtactoe.gameservice.firebase.GameFCMComponent
-import li.brianv.bidtactoe.gameservice.game.player.AndroidPlayer
 import li.brianv.bidtactoe.gameservice.game.player.Player
-import li.brianv.bidtactoe.gameservice.game.player.WebPlayer
-import li.brianv.bidtactoe.gameservice.repository.AIRepository
+import li.brianv.bidtactoe.gameservice.repository.AIDataMongoRepository
+import li.brianv.bidtactoe.gameservice.repository.FrozenAIDataMongoRepository
 import li.brianv.bidtactoe.gameservice.websockets.GameWSComponent
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -17,8 +16,10 @@ class GameManagerTest {
     private val matchQueueMap = HashMap<String, Player>()
     private val gameFCMComponent = mock(GameFCMComponent::class.java)
     private val gameWSComponent = mock(GameWSComponent::class.java)
-    private val aiRepository = mock(AIRepository::class.java)
-    private val gameManager = GameManager(playerQueue, gameArray, matchQueueMap, gameFCMComponent, gameWSComponent, aiRepository)
+    private val aiDataMongoRepository: AIDataMongoRepository = mock(AIDataMongoRepository::class.java)
+    private val frozenAIDataMongoRepository: FrozenAIDataMongoRepository = mock(FrozenAIDataMongoRepository::class.java)
+    private val gameManager = GameManager(playerQueue, gameArray, matchQueueMap, gameFCMComponent,
+            gameWSComponent, aiDataMongoRepository, frozenAIDataMongoRepository)
 
     @Test
     fun joinGame_oneWebJoin() {

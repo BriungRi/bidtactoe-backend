@@ -5,13 +5,14 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler
 import org.springframework.stereotype.Component
 import java.util.*
 
-const val AI_ADD_DELAY = 250L
+private const val AI_ADD_DELAY = 250L
+private const val AI_ADD_START_DELAY = 10000
 
 @Component
 class AIService(concurrentTaskScheduler: ConcurrentTaskScheduler, gameManager: GameManager) {
     init {
         concurrentTaskScheduler.scheduleAtFixedRate({
             gameManager.addAI()
-        }, Date(Date().time + 5000), AI_ADD_DELAY)
+        }, Date(Date().time + AI_ADD_START_DELAY), AI_ADD_DELAY)
     }
 }

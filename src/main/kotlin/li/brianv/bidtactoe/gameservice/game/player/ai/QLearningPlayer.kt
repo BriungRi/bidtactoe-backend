@@ -40,9 +40,9 @@ class QLearningPlayer(private val aiRepository: AIRepository,
     override fun getMoveIndex(biddingPower: Int, cells: String): Int {
         getWinningMoveIndex(cells)?.let { return it }
         getBlockingMoveIndex(cells)?.let { return it }
-        getConsecutiveMoveIndex(cells)?.let { return it }
+//        getConsecutiveMoveIndex(cells)?.let { return it }
         getMiddleIndex(cells)?.let { return it }
-        getCornerIndex(cells)?.let { return it }
+//        getCornerIndex(cells)?.let { return it }
 
         val openPositions = getOpenPositions(cells)
         val bestOpenPosition = aiRepository.getBestOpenPositionByQValue(biddingPower, cells, openPositions, isPlayerOne).first
@@ -72,13 +72,14 @@ class QLearningPlayer(private val aiRepository: AIRepository,
     override fun onGameOver(winnerUsername: String) {
         val didWin = this.username == winnerUsername
         val didTie = winnerUsername == NO_WINNER_USERNAME
-        if (training) {
-            aiRepository.incrNumGames()
-            updateBidQValues(didWin, didTie)
-            updateMoveQValues(didWin, didTie)
-            if (didWin)
-                aiRepository.incrNumWins()
-        } else {
+
+        aiRepository.incrNumGames()
+        updateBidQValues(didWin, didTie)
+        updateMoveQValues(didWin, didTie)
+        if (didWin)
+            aiRepository.incrNumWins()
+
+        if (!training) {
             when {
                 didWin -> aiRepository.incrNumEvalWins()
                 didTie -> aiRepository.incrNumEvalTies()
