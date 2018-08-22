@@ -37,7 +37,7 @@ class MongoConnectionService(@Qualifier("driverTaskScheduler") taskScheduler: Ta
     private fun connectToAtlasMongo() {
         try {
             logger.info("Trying to connect to remote mongo")
-            val atlasURI = MongoClientURI("mongodb+srv://brian:mZGEpxV46WlZCWrL@bidtactoe-svmnm.mongodb.net/")
+            val atlasURI = MongoClientURI("")
             atlasMongoClient = MongoClient(atlasURI)
         } catch (e: Exception) {
             logger.error("Unable to connect to remote mongod", e)
