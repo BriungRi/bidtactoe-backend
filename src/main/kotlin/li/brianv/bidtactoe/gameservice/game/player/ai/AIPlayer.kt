@@ -75,14 +75,15 @@ abstract class AIPlayer : Player() {
                 when (cells[position]) {
                     PLAYER_ONE_PIECE -> 1
                     PLAYER_TWO_PIECE -> -1
-                    else -> {
-                        0
-                    }
+                    else -> 0
                 }
             }.sum()
 
             if ((isPlayerOne && sum == 2) || (!isPlayerOne && sum == -2)) {
                 return biddingPower
+            } else if((isPlayerOne && sum == 1 && winPosition.filter { position -> cells[position] == EMPTY_SPACE }.size == 2 && biddingPower >= 151) ||
+                    (!isPlayerOne && sum == -1 && winPosition.filter { position -> cells[position] == EMPTY_SPACE }.size == 2 && biddingPower >= 151) ) {
+                return 200 - biddingPower + 1
             }
         }
         return null
@@ -95,9 +96,7 @@ abstract class AIPlayer : Player() {
                 when (cells[position]) {
                     PLAYER_ONE_PIECE -> 1
                     PLAYER_TWO_PIECE -> -1
-                    else -> {
-                        0
-                    }
+                    else -> 0
                 }
             }.sum()
 
@@ -121,6 +120,7 @@ abstract class AIPlayer : Player() {
             }.sum()
             if (isPlayerOne && sum == 2 || !isPlayerOne && sum == -2)
                 return winPosition.first { position -> cells[position] == EMPTY_SPACE } // Return winning position
+
         }
         return null
     }

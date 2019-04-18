@@ -5,7 +5,7 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler
 import org.springframework.stereotype.Component
 import java.util.*
 
-const val AI_ADD_DELAY = 5000L
+const val AI_ADD_DELAY = 2000L
 
 @Component
 class AIService(concurrentTaskScheduler: ConcurrentTaskScheduler, gameManager: GameManager) {

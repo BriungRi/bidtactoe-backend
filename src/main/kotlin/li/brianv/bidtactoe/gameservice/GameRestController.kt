@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
-@CrossOrigin(origins = ["http://localhost:3000", "http://tactoe.bid", "http://localhost:3001"])
+@CrossOrigin(origins = ["*", "http://localhost:3000", "http://bidtactoe.live", "http://localhost:3001"])
 @RestController
 class GameRestController(val gameManager: GameManager, val userRepository: UserRepository, val aiRepository: AIRepository) {
 

@@ -12,7 +12,7 @@ private const val LEARNING_RATE = 0.1
 private const val DISCOUNT_FACTOR = 0.1
 private const val PROBABILITY_EXPLORE = 0.05
 private const val REWARD = 1.0
-private const val TIE_REWARD = 0.0
+private const val TIE_REWARD = 0.05
 
 class QLearningPlayer(private val aiRepository: AIRepository,
                       private val bidActionKeys: MutableList<String>,

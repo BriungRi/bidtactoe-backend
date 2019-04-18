@@ -21,10 +21,11 @@ class MongoConnectionService(@Qualifier("driverTaskScheduler") taskScheduler: Ta
     private var localMongoClient: MongoClient? = null
 
     fun getAtlasMongoClient(): MongoClient {
-        if (atlasMongoClient != null)
-            return atlasMongoClient as MongoClient
-        else
-            throw MongoNotYetAvailableException()
+        return getLocalMongoClient()
+//        if (atlasMongoClient != null)
+//            return atlasMongoClient as MongoClient
+//        else
+//            throw MongoNotYetAvailableException()
     }
 
     fun getLocalMongoClient(): MongoClient {
@@ -56,9 +57,9 @@ class MongoConnectionService(@Qualifier("driverTaskScheduler") taskScheduler: Ta
     init {
         mongoConnectionTask = taskScheduler.scheduleWithFixedDelay({
             try {
-                if (atlasMongoClient == null || localMongoClient == null) {
-                    if (atlasMongoClient == null)
-                        connectToAtlasMongo()
+                if (localMongoClient == null) {
+//                    if (atlasMongoClient == null)
+//                        connectToAtlasMongo()
                     if (localMongoClient == null)
                         connectToLocalMongo()
                 } else {
